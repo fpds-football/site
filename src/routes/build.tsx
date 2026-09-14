@@ -13,8 +13,8 @@ export const Route = createFileRoute("/build")({
       path: "/build/",
     }),
   pendingComponent: () => (
-    <div className="wrap mt-8 text-ink-soft">
-      <h1 className="text-[1.5rem] font-bold text-ink">Create a submission</h1>
+    <div className="wrap mt-8 text-kumo-subtle">
+      <h1 className="text-2xl font-semibold text-kumo-strong">Create a submission</h1>
       <p>The builder is loading. It runs in your browser, and sends nothing to a server.</p>
     </div>
   ),

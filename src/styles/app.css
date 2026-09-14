@@ -1,17 +1,7 @@
+/* Kumo: Cloudflare's component library. The import order matters: Kumo registers its theme tokens before Tailwind. */
+@source "../../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
+@import "@cloudflare/kumo/styles/tailwind";
 @import "tailwindcss";
-
-@theme {
-  --color-paper: #f6f7f9;
-  --color-ink: #10141a;
-  --color-ink-soft: #545c68;
-  --color-rule: #d6dbe2;
-  --color-verified: #14577f;
-  --color-stated: #85631a;
-  --color-field: #ffffff;
-
-  --font-sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
-}
 
 @layer base {
   html {
@@ -19,32 +9,21 @@
   }
 
   body {
-    @apply bg-paper font-sans text-ink antialiased;
-    font-size: 17px;
+    @apply bg-kumo-canvas text-kumo-default antialiased;
+    font-size: 16px;
     line-height: 1.6;
   }
+}
 
-  a {
-    @apply text-verified underline decoration-1 underline-offset-2;
-  }
-
-  a:focus-visible {
-    @apply rounded-[1px] outline-2 outline-offset-3 outline-verified;
-  }
-
-  /*
-   * iOS Safari zooms into a form control when its text is less than 16px. Keep every control at 16px or more.
-   * Do not use maximum-scale in the viewport tag to stop the zoom. It also stops pinch zoom, which people need.
-   */
-  input,
-  select,
-  textarea {
-    font-size: max(16px, 1rem);
-  }
-
-  code {
-    @apply font-mono text-[0.86em];
-  }
+/*
+ * iOS Safari zooms into a form control when its text is less than 16px. Keep every control at 16px or more.
+ * This rule is outside a layer, so it has priority over Kumo and Tailwind utility classes.
+ * Do not use maximum-scale in the viewport tag to stop the zoom. It also stops pinch zoom, which people need.
+ */
+input,
+select,
+textarea {
+  font-size: max(16px, 1rem);
 }
 
 @layer components {
@@ -78,10 +57,14 @@
   }
 
   .section-heading {
-    @apply mt-10 mb-3 text-[1.1rem] font-semibold tracking-[-0.01em];
+    @apply mt-10 mb-3 text-lg font-semibold tracking-[-0.01em] text-kumo-strong;
   }
 
-  .small-print {
-    @apply text-[0.92rem] text-ink-soft;
+  .eyebrow {
+    @apply mt-11 mb-2 text-sm tracking-[0.04em] text-kumo-subtle uppercase;
+  }
+
+  .page-title {
+    @apply mb-5 max-w-[26ch] text-[clamp(1.6rem,1.15rem+1.8vw,2.3rem)] leading-tight font-semibold tracking-[-0.02em] text-kumo-strong;
   }
 }

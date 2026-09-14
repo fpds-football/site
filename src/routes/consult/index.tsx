@@ -1,4 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { LayerCard, Link } from "@cloudflare/kumo";
+import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
+import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "~/components/SiteHeader";
 import { consultations } from "~/content/consultations";
 import { DECISIONS_URL, pageHead, SPEC_URL } from "~/content/site";
@@ -20,11 +22,9 @@ function ConsultIndex() {
       <SiteHeader>Consultations</SiteHeader>
       <main className="wrap">
         <div className="prose-block">
-          <p className="mt-11 mb-2 text-[0.85rem] tracking-[0.04em] text-ink-soft uppercase">Take part</p>
-          <h1 className="mb-5 max-w-[26ch] text-[clamp(1.6rem,1.15rem+1.8vw,2.3rem)] leading-tight font-bold tracking-[-0.02em]">
-            Help decide what goes into FPDS.
-          </h1>
-          <p className="text-[1.05rem]">
+          <p className="eyebrow">Take part</p>
+          <h1 className="page-title">Help decide what goes into FPDS.</h1>
+          <p className="text-lg">
             FPDS starts small. A new field enters the standard only after the people who use player submissions give
             their opinion. Agents, club staff and players know how transfers work. We ask you before we decide.
           </p>
@@ -34,13 +34,18 @@ function ConsultIndex() {
           </p>
 
           <h2 className="section-heading">Open at launch</h2>
-          <ul className="!list-none border-t border-rule !pl-0">
+          <ul className="!list-none space-y-3 !pl-0">
             {consultations.map((c) => (
-              <li key={c.slug} className="!m-0 border-b border-rule py-4">
-                <Link to={`/consult/${c.slug}/` as "/consult/wages/"} className="font-semibold">
-                  {c.title}
+              <li key={c.slug} className="!m-0">
+                <Link href={`/consult/${c.slug}/`} variant="plain" className="block no-underline">
+                  <LayerCard className="group p-4 transition-colors hover:bg-kumo-tint">
+                    <span className="flex items-center justify-between gap-2 font-semibold text-kumo-link">
+                      {c.title}
+                      <ArrowRightIcon aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                    <span className="mt-1 block text-sm text-kumo-subtle">{c.question}</span>
+                  </LayerCard>
                 </Link>
-                <span className="block text-[0.92rem] text-ink-soft">{c.question}</span>
               </li>
             ))}
           </ul>
@@ -48,7 +53,7 @@ function ConsultIndex() {
           <h2 className="section-heading">Later</h2>
           <p>
             A new consultation opens every two to three weeks. Each one stays open for at least 14 days. The full list
-            of open questions is in section 14 of the <a href={`${SPEC_URL}#14-open-questions`}>specification</a>.
+            of open questions is in section 14 of the <Link href={`${SPEC_URL}#14-open-questions`}>specification</Link>.
           </p>
 
           <h2 className="section-heading">How we use your answers</h2>
@@ -58,10 +63,10 @@ function ConsultIndex() {
               reasons. It does not show names.
             </li>
             <li>
-              We record each decision and its reasons in the <a href={DECISIONS_URL}>decision log</a>.
+              We record each decision and its reasons in the <Link href={DECISIONS_URL}>decision log</Link>.
             </li>
             <li>
-              The <Link to="/consult/privacy/">privacy notice</Link> explains which data we keep, and for how long.
+              The <Link href="/consult/privacy/">privacy notice</Link> explains which data we keep, and for how long.
             </li>
           </ul>
         </div>

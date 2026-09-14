@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "@cloudflare/kumo";
 import { SiteHeader } from "./SiteHeader";
 
 export function NotFound() {
@@ -6,9 +6,9 @@ export function NotFound() {
     <>
       <SiteHeader />
       <main className="wrap prose-block">
-        <h1 className="mt-12 mb-5 text-[2rem] font-bold tracking-[-0.02em]">This page does not exist.</h1>
+        <h1 className="page-title mt-12">This page does not exist.</h1>
         <p>
-          Go to the <Link to="/">home page</Link>, or see the <Link to="/consult/">consultations</Link>.
+          Go to the <Link href="/">home page</Link>, or see the <Link href="/consult/">consultations</Link>.
         </p>
       </main>
     </>

@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Banner, Link } from "@cloudflare/kumo";
+import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { SiteHeader } from "~/components/SiteHeader";
 import { pageHead } from "~/content/site";
@@ -23,15 +24,13 @@ function Privacy() {
   return (
     <>
       <SiteHeader>
-        <Link to="/consult/">Consultations</Link> / Privacy notice
+        <Link href="/consult/">Consultations</Link> / Privacy notice
       </SiteHeader>
       <main className="wrap">
         <div className="prose-block">
-          <p className="mt-11 mb-2 text-[0.85rem] tracking-[0.04em] text-ink-soft uppercase">Privacy</p>
-          <h1 className="mb-5 text-[clamp(1.6rem,1.15rem+1.8vw,2.3rem)] leading-tight font-bold tracking-[-0.02em]">
-            Privacy notice for consultations
-          </h1>
-          <p className="text-[1.05rem]">
+          <p className="eyebrow">Privacy</p>
+          <h1 className="page-title">Privacy notice for consultations</h1>
+          <p className="text-lg">
             This notice explains how FPDS uses the data that you give when you answer a consultation.
           </p>
 
@@ -50,7 +49,7 @@ function Privacy() {
               <li>The country where you work, if you give it</li>
               <li>Your email address, if you give it</li>
             </ul>
-            <p>Do not write information about the health, wages or contract of a specific person.</p>
+            <Banner variant="alert" className="mb-4" description="Do not write information about the health, wages or contract of a specific person." />
           </Section>
 
           <Section heading="Why we collect it">
@@ -106,7 +105,7 @@ function Privacy() {
             </p>
           </Section>
 
-          <p className="small-print">Last change: before launch.</p>
+          <p className="text-sm text-kumo-subtle">Last change: before launch.</p>
         </div>
       </main>
     </>
@@ -123,5 +122,5 @@ function Section({ heading, children }: { heading: string; children: ReactNode }
 }
 
 function Email() {
-  return <a href="mailto:privacy@fpds.football">privacy@fpds.football</a>;
+  return <Link href="mailto:privacy@fpds.football">privacy@fpds.football</Link>;
 }

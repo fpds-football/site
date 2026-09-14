@@ -1,4 +1,6 @@
+import { Banner, Button, LayerCard } from "@cloudflare/kumo";
 import { VALUE_LABELS } from "@fpds-football/fpds";
+import { PlusIcon, TrashIcon, UserIcon } from "@phosphor-icons/react";
 import {
   CheckboxGroupField,
   CountryField,
@@ -83,13 +85,20 @@ export function SectionForm({ section, builder }: { section: SectionId; builder:
         <>
           <SelectField builder={builder} pointer="/consent/lawful_basis" label="Lawful basis for sharing this data" options={VALUE_LABELS.lawful_basis} />
           <DateField builder={builder} pointer="/consent/consent_date" label="Consent date" />
-          <div className="mb-5 border border-rule bg-field px-4 py-3 text-[0.92rem]" data-field="/consent/is_minor">
-            <span className="font-semibold">Minor status: </span>
-            {builder.isMinor === undefined
-              ? "The builder calculates this from the date of birth."
-              : builder.isMinor
-                ? "Minor. The player is less than 18 years old today."
-                : "Not a minor. The player is 18 or older today."}
+          <div className="mb-5" data-field="/consent/is_minor">
+            <Banner
+              variant={builder.isMinor ? "alert" : "secondary"}
+              size="sm"
+              icon={<UserIcon />}
+              title="Minor status"
+              description={
+                builder.isMinor === undefined
+                  ? "The builder calculates this from the date of birth."
+                  : builder.isMinor
+                    ? "Minor. The player is less than 18 years old today."
+                    : "Not a minor. The player is 18 or older today."
+              }
+            />
           </div>
         </>
       );
@@ -101,7 +110,7 @@ function ClubFields({ builder, pointer, label, hint }: { builder: Builder; point
   return (
     <FieldShell builder={builder} pointer={pointer} label={label} {...(hint ? { hint } : {})} source>
       {() => (
-        <div className="border-l-2 border-rule pl-4" data-state={field.state}>
+        <div className="border-l-2 border-kumo-line pl-4" data-state={field.state}>
           <TextField builder={builder} pointer={`${pointer}/name`} label="Club name" />
           <CountryField builder={builder} pointer={`${pointer}/country`} label="Country" />
         </div>
@@ -117,28 +126,24 @@ function RepresentationFields({ builder }: { builder: Builder }) {
   if (field.state === "optional" && !present) {
     return (
       <div className="mb-5">
-        <p className="mb-3 text-[0.95rem]">{field.reason ?? "Representation is optional."}</p>
-        <button
-          type="button"
-          className="border border-verified px-3 py-1.5 text-[0.92rem] text-verified"
-          onClick={() => builder.set("/representation", { agent_name: "" })}
-        >
+        <p className="mb-3">{field.reason ?? "Representation is optional."}</p>
+        <Button icon={<PlusIcon />} onClick={() => builder.set("/representation", { agent_name: "" })}>
           Add the player's agent
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <>
-      {field.reason ? <p className="mb-4 text-[0.9rem] text-ink-soft">{field.reason}</p> : null}
+      {field.reason ? <p className="mb-4 text-sm text-kumo-subtle">{field.reason}</p> : null}
       <TextField builder={builder} pointer="/representation/agent_name" label="Agent name" source />
       <TextField builder={builder} pointer="/representation/fifa_agent_licence" label="FIFA agent licence number" source />
       <SelectField builder={builder} pointer="/representation/mandate_status" label="Mandate" options={VALUE_LABELS.mandate_status} source />
       {field.state === "optional" ? (
-        <button type="button" className="text-[0.9rem] text-verified underline" onClick={() => builder.set("/representation", undefined)}>
+        <Button variant="secondary-destructive" icon={<TrashIcon />} onClick={() => builder.set("/representation", undefined)}>
           Remove the agent
-        </button>
+        </Button>
       ) : null}
     </>
   );
@@ -149,25 +154,24 @@ function PerformanceFields({ builder }: { builder: Builder }) {
 
   return (
     <>
-      <p className="mb-4 text-[0.92rem] text-ink-soft">
+      <p className="mb-4 text-sm text-kumo-subtle">
         Add one record for each season and competition. Minutes are required, because goals without minutes are not
         information.
       </p>
       {rows.map((_, index) => {
         const base = `/performance/${index}`;
         return (
-          <fieldset key={index} className="mb-5 border border-rule bg-field px-4 pt-3 pb-1" data-row={index}>
-            <legend className="px-1 font-semibold">Season record {index + 1}</legend>
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <SourcePicker builder={builder} pointer={base} />
-              <button
-                type="button"
-                className="text-[0.85rem] text-verified underline"
-                onClick={() => builder.set(base, undefined)}
-              >
-                Remove this season
-              </button>
-            </div>
+          <LayerCard key={index} render={<fieldset />} className="mb-5" data-row={index}>
+            <LayerCard.Secondary className="flex flex-wrap items-center justify-between gap-2">
+              <legend className="float-left font-semibold">Season record {index + 1}</legend>
+              <div className="flex flex-wrap items-center gap-2">
+                <SourcePicker builder={builder} pointer={base} />
+                <Button size="sm" variant="secondary-destructive" icon={<TrashIcon />} onClick={() => builder.set(base, undefined)}>
+                  Remove this season
+                </Button>
+              </div>
+            </LayerCard.Secondary>
+            <LayerCard.Primary className="p-4">
             <TextField builder={builder} pointer={`${base}/season`} label="Season" hint="2025/26, or 2026 for a league that plays in one calendar year." />
             <TextField builder={builder} pointer={`${base}/competition`} label="Competition" />
             <CountryField builder={builder} pointer={`${base}/competition_country`} label="Competition country" />
@@ -183,16 +187,13 @@ function PerformanceFields({ builder }: { builder: Builder }) {
                 hint="Appearances with no goals conceded while the player was on the pitch."
               />
             </div>
-          </fieldset>
+            </LayerCard.Primary>
+          </LayerCard>
         );
       })}
-      <button
-        type="button"
-        className="border border-verified px-3 py-1.5 text-[0.92rem] text-verified"
-        onClick={() => builder.set(`/performance/${rows.length}`, { season: "" })}
-      >
+      <Button icon={<PlusIcon />} onClick={() => builder.set(`/performance/${rows.length}`, { season: "" })}>
         Add a season
-      </button>
+      </Button>
     </>
   );
 }

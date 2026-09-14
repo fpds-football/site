@@ -14,7 +14,7 @@ This repository does not serve the schema. `fpds-football/spec` serves `https://
 ## Technology
 
 - [TanStack Start](https://tanstack.com/start) with React. Content pages are prerendered to static HTML.
-- Tailwind CSS.
+- [Kumo](https://github.com/cloudflare/kumo), Cloudflare's component library, with Tailwind CSS. Use Kumo semantic tokens (`bg-kumo-base`, `text-kumo-subtle`) and components, not raw colours.
 - Cloudflare Workers.
 - Playwright tests against the production build in the local Cloudflare runtime.
 

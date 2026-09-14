@@ -1,4 +1,19 @@
+import { Badge, Banner, Button, Dialog, LayerCard } from "@cloudflare/kumo";
 import { labelFor } from "@fpds-football/fpds";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CheckCircleIcon,
+  CircleIcon,
+  DownloadSimpleIcon,
+  FloppyDiskIcon,
+  FolderOpenIcon,
+  InfoIcon,
+  LockSimpleIcon,
+  TrashIcon,
+  WarningCircleIcon,
+  WarningIcon,
+} from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { SubmissionView } from "~/components/SubmissionView";
 import { buildExport, exportFileName } from "./export";
@@ -13,12 +28,17 @@ const STATUS_TEXT: Record<SectionStatus, string> = {
   optional: "Optional",
 };
 
-const STATUS_ICON: Record<SectionStatus, string> = { complete: "✓", incomplete: "●", optional: "○" };
+function StatusIcon({ status }: { status: SectionStatus }) {
+  if (status === "complete") return <CheckCircleIcon aria-hidden="true" weight="fill" className="text-kumo-success" />;
+  if (status === "incomplete") return <WarningCircleIcon aria-hidden="true" weight="fill" className="text-kumo-danger" />;
+  return <CircleIcon aria-hidden="true" className="text-kumo-subtle" />;
+}
 
 export function Builder() {
   const builder = useBuilder();
   const [section, setSection] = useState<SectionId>("submission");
   const [message, setMessage] = useState<string>();
+  const [confirmClear, setConfirmClear] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const { exportResult } = builder;
@@ -70,31 +90,34 @@ export function Builder() {
   };
 
   const onClear = () => {
-    if (window.confirm("Clear all the information in the builder? This cannot be undone.")) {
-      builder.reset();
-      goTo("submission");
-      setMessage("The builder is empty.");
-    }
+    builder.reset();
+    setConfirmClear(false);
+    goTo("submission");
+    setMessage("The builder is empty.");
   };
 
-  const current = SECTIONS.find((s) => s.id === section) ?? SECTIONS[0];
+  const index = SECTIONS.findIndex((s) => s.id === section);
+  const current = SECTIONS[index] ?? SECTIONS[0];
+  const previous = SECTIONS[index - 1];
+  const next = SECTIONS[index + 1];
   const sectionConflicts = builder.conflicts.filter((issue) => sectionFor(issue.path) === section);
 
   return (
     <div className="mx-auto max-w-[84rem] px-6 pb-10">
       <div className="mt-8 mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-[clamp(1.5rem,1.1rem+1.5vw,2.1rem)] leading-tight font-bold tracking-[-0.02em]">
+          <h1 className="text-[clamp(1.5rem,1.1rem+1.5vw,2.1rem)] leading-tight font-semibold tracking-[-0.02em] text-kumo-strong">
             Create a submission
           </h1>
-          <p className="mt-1 text-[0.95rem] text-ink-soft">
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-kumo-subtle">
+            <LockSimpleIcon aria-hidden="true" />
             Your information stays in this browser. The builder sends nothing to a server.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 text-[0.9rem]">
-          <button type="button" className="border border-rule bg-field px-3 py-1.5" onClick={() => fileInput.current?.click()}>
+        <div className="flex flex-wrap gap-2">
+          <Button icon={<FolderOpenIcon />} onClick={() => fileInput.current?.click()}>
             Open a file
-          </button>
+          </Button>
           <input
             ref={fileInput}
             type="file"
@@ -103,51 +126,63 @@ export function Builder() {
             data-testid="open-file"
             onChange={(event) => onOpen(event.target.files?.[0])}
           />
-          <button type="button" className="border border-rule bg-field px-3 py-1.5" onClick={onSaveDraft}>
+          <Button icon={<FloppyDiskIcon />} onClick={onSaveDraft}>
             Save draft
-          </button>
-          <button type="button" className="border border-rule bg-field px-3 py-1.5 text-[#8c1d18]" onClick={onClear}>
+          </Button>
+          <Button variant="secondary-destructive" icon={<TrashIcon />} onClick={() => setConfirmClear(true)}>
             Clear everything
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div role="status" aria-live="polite" className="empty:hidden mb-4 border-l-2 border-verified bg-field px-3 py-2 text-[0.92rem]">
-        {message}
+      <Dialog.Root open={confirmClear} onOpenChange={setConfirmClear}>
+        <Dialog size="sm" className="p-6">
+          <Dialog.Title className="mb-2 text-lg font-semibold">Clear everything?</Dialog.Title>
+          <Dialog.Description className="mb-5 text-kumo-subtle">
+            The builder removes all the information that you entered. You cannot undo this.
+          </Dialog.Description>
+          <div className="flex justify-end gap-2">
+            <Dialog.Close render={(props) => <Button {...props}>Cancel</Button>} />
+            <Button variant="destructive" onClick={onClear}>
+              Clear everything
+            </Button>
+          </div>
+        </Dialog>
+      </Dialog.Root>
+
+      <div role="status" aria-live="polite" className="mb-4 empty:hidden">
+        {message ? <Banner icon={<InfoIcon weight="fill" />} description={message} /> : null}
       </div>
 
       {builder.isMinor ? (
-        <p className="mb-4 border border-[#8a4b00] bg-[#fff4e5] px-4 py-3 text-[0.95rem] text-[#6b3a00]" data-testid="minor-notice">
-          <strong>This player is a minor.</strong> Safeguarding rules apply. An intermediary must send the submission,
-          and the player cannot send it. FIFA rules on the protection of minors and national safeguarding rules apply.
-        </p>
+        <div className="mb-4" data-testid="minor-notice">
+          <Banner
+            variant="alert"
+            icon={<WarningIcon weight="fill" />}
+            title="This player is a minor."
+            description="Safeguarding rules apply. An intermediary must send the submission, and the player cannot send it. FIFA rules on the protection of minors and national safeguarding rules apply."
+          />
+        </div>
       ) : null}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[12rem_minmax(0,1fr)_minmax(0,26rem)]">
         <nav aria-label="Sections" className="lg:sticky lg:top-4 lg:self-start">
-          <ol className="flex gap-1 overflow-x-auto border-b border-rule pb-2 lg:flex-col lg:overflow-visible lg:border-b-0 lg:pb-0">
+          <ol className="flex list-none gap-1 overflow-x-auto border-b border-kumo-line pb-2 pl-0 lg:flex-col lg:overflow-visible lg:border-b-0 lg:pb-0">
             {SECTIONS.map((item) => {
               const status = builder.sectionStatus[item.id];
               const active = item.id === section;
               return (
                 <li key={item.id} className="shrink-0">
-                  <button
-                    type="button"
+                  <Button
+                    variant={active ? "secondary" : "ghost"}
                     aria-current={active ? "step" : undefined}
                     aria-label={`${item.title}, ${STATUS_TEXT[status]}`}
                     onClick={() => goTo(item.id)}
-                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-[0.95rem] ${
-                      active ? "bg-field font-semibold shadow-[inset_3px_0_0_var(--color-verified)]" : "hover:bg-field"
-                    }`}
+                    className={`w-full justify-start gap-2 ${active ? "font-semibold" : ""}`}
                   >
-                    <span
-                      aria-hidden="true"
-                      className={status === "incomplete" ? "text-[#b3261e]" : status === "complete" ? "text-verified" : "text-ink-soft"}
-                    >
-                      {STATUS_ICON[status]}
-                    </span>
+                    <StatusIcon status={status} />
                     <span>{item.title}</span>
-                  </button>
+                  </Button>
                 </li>
               );
             })}
@@ -155,83 +190,98 @@ export function Builder() {
         </nav>
 
         <section aria-labelledby="section-heading" className="min-w-0">
-          <h2 id="section-heading" ref={headingRef} tabIndex={-1} className="mb-4 text-[1.25rem] font-semibold outline-none">
+          <h2
+            id="section-heading"
+            ref={headingRef}
+            tabIndex={-1}
+            className="mb-4 text-xl font-semibold text-kumo-strong outline-none"
+          >
             {current?.title}
           </h2>
           {sectionConflicts.length > 0 ? (
-            <p className="mb-4 text-[0.9rem] text-[#8c1d18]">This section has a conflict. See the message under the field.</p>
+            <p className="mb-4 text-sm text-kumo-danger">This section has a conflict. See the message under the field.</p>
           ) : null}
           <SectionForm section={section} builder={builder} />
-          <div className="mt-8 flex justify-between border-t border-rule pt-4 text-[0.92rem]">
-            {SECTIONS.findIndex((s) => s.id === section) > 0 ? (
-              <button type="button" className="text-verified underline" onClick={() => goTo(SECTIONS[SECTIONS.findIndex((s) => s.id === section) - 1]!.id)}>
+          <div className="mt-8 flex justify-between border-t border-kumo-line pt-4">
+            {previous ? (
+              <Button variant="ghost" icon={<ArrowLeftIcon />} onClick={() => goTo(previous.id)}>
                 Previous section
-              </button>
+              </Button>
             ) : (
               <span />
             )}
-            {SECTIONS.findIndex((s) => s.id === section) < SECTIONS.length - 1 ? (
-              <button type="button" className="text-verified underline" onClick={() => goTo(SECTIONS[SECTIONS.findIndex((s) => s.id === section) + 1]!.id)}>
+            {next ? (
+              <Button variant="ghost" onClick={() => goTo(next.id)}>
                 Next section
-              </button>
+                <ArrowRightIcon aria-hidden="true" />
+              </Button>
             ) : null}
           </div>
         </section>
 
         <aside aria-label="Preview and export" className="min-w-0 lg:sticky lg:top-4 lg:self-start">
-          <div className="mb-3 border border-rule bg-paper p-4">
-            <button
-              type="button"
-              onClick={onExport}
-              aria-describedby="export-status"
-              className={`w-full px-4 py-2.5 font-semibold ${
-                exportResult.valid ? "bg-verified text-white" : "cursor-not-allowed bg-rule text-ink-soft"
-              }`}
-            >
-              Export submission
-            </button>
-            {exportResult.valid ? (
-              <p id="export-status" className="mt-2 text-[0.85rem] text-ink-soft">
-                The file is valid against FPDS 0.1.
-              </p>
-            ) : (
-              <div id="export-status" className="mt-3 text-[0.88rem]">
-                <p className="mb-1 font-semibold">To export, complete these items:</p>
-                <ul className="max-h-48 overflow-y-auto" data-testid="export-checklist">
-                  {builder.blockers.map((issue) => {
-                    const target = sectionFor(issue.path);
-                    return (
-                      <li key={`${issue.code}${issue.path}`} className="mb-1">
-                        <button type="button" className="text-left text-verified underline" onClick={() => target && goTo(target)}>
-                          {issue.message}
-                        </button>
+          <LayerCard className="mb-3">
+            <LayerCard.Primary className="p-4">
+              <Button
+                variant={exportResult.valid ? "primary" : "secondary"}
+                size="lg"
+                icon={<DownloadSimpleIcon />}
+                onClick={onExport}
+                aria-describedby="export-status"
+                className="w-full justify-center"
+              >
+                Export submission
+              </Button>
+              {exportResult.valid ? (
+                <p id="export-status" className="mt-2 flex items-center gap-1.5 text-sm text-kumo-success">
+                  <CheckCircleIcon aria-hidden="true" weight="fill" />
+                  The file is valid against FPDS 0.1.
+                </p>
+              ) : (
+                <div id="export-status" className="mt-3 text-sm">
+                  <p className="mb-1 font-semibold">To export, complete these items:</p>
+                  <ul className="max-h-48 list-none space-y-1 overflow-y-auto pl-0" data-testid="export-checklist">
+                    {builder.blockers.map((issue) => {
+                      const target = sectionFor(issue.path);
+                      return (
+                        <li key={`${issue.code}${issue.path}`}>
+                          <button
+                            type="button"
+                            className="text-left text-kumo-link underline decoration-1 underline-offset-2"
+                            onClick={() => target && goTo(target)}
+                          >
+                            {issue.message}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+              {exportResult.omitted.length > 0 ? (
+                <div className="mt-3 text-sm text-kumo-subtle" data-testid="omitted">
+                  <p className="font-semibold">The export does not include these values, because they do not apply:</p>
+                  <ul className="list-disc pl-5">
+                    {exportResult.omitted.map((item) => (
+                      <li key={item.pointer}>
+                        {labelFor(item.pointer)}. {item.reason}
                       </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-            {exportResult.omitted.length > 0 ? (
-              <div className="mt-3 text-[0.85rem] text-ink-soft" data-testid="omitted">
-                <p className="font-semibold">The export does not include these values, because they do not apply:</p>
-                <ul className="list-disc pl-5">
-                  {exportResult.omitted.map((item) => (
-                    <li key={item.pointer}>
-                      {labelFor(item.pointer)}. {item.reason}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            {exportResult.warnings.map((issue) => (
-              <p key={`${issue.code}${issue.path}`} className="mt-2 border-l-2 border-stated pl-2 text-[0.85rem] text-stated">
-                {issue.message}
-              </p>
-            ))}
-          </div>
-          <p className="mb-2 text-[0.85rem] text-ink-soft">How a club sees this submission:</p>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {exportResult.warnings.map((issue) => (
+                <div key={`${issue.code}${issue.path}`} className="mt-2">
+                  <Banner variant="alert" size="sm" description={issue.message} />
+                </div>
+              ))}
+            </LayerCard.Primary>
+          </LayerCard>
+          <p className="mb-2 flex items-center gap-2 text-sm text-kumo-subtle">
+            How a club sees this submission <Badge variant="neutral">Preview</Badge>
+          </p>
           <SubmissionView document={exportResult.document ?? exportResult.preview} isMinor={builder.isMinor} />
-          <p className="mt-2 text-[0.8rem] text-ink-soft">
+          <p className="mt-2 text-xs text-kumo-subtle">
             FPDS checks the structure of a submission. It does not check that the information is true.
           </p>
         </aside>

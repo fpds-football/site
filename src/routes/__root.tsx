@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { AppLinkProvider } from "~/components/AppLink";
 import { SiteFooter } from "~/components/SiteFooter";
 import appCss from "~/styles/app.css?url";
 
@@ -22,16 +23,19 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <>
-      <Outlet />
-      <SiteFooter />
-    </>
+    <AppLinkProvider>
+      {/* Kumo portals its popups to the end of the body. "isolate" keeps them above this layout (Kumo installation guide). */}
+      <div className="isolate">
+        <Outlet />
+        <SiteFooter />
+      </div>
+    </AppLinkProvider>
   );
 }
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" data-mode="light">
       <head>
         <HeadContent />
       </head>

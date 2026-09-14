@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Badge, Banner, LayerCard, Link } from "@cloudflare/kumo";
+import { CheckCircleIcon, ClockIcon, XCircleIcon } from "@phosphor-icons/react/dist/ssr";
 import type { Consultation } from "~/content/consultations";
 import { DECISIONS_URL } from "~/content/site";
 import { SiteHeader } from "./SiteHeader";
@@ -7,25 +8,33 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
   return (
     <>
       <SiteHeader>
-        <Link to="/consult/">Consultations</Link> / {c.title}
+        <Link href="/consult/">Consultations</Link> / {c.title}
       </SiteHeader>
 
       <main className="wrap">
         <div className="prose-block">
-          <p className="mt-11 mb-2 text-[0.85rem] tracking-[0.04em] text-ink-soft uppercase">Consultation · {c.oq}</p>
-          <h1 className="mb-5 max-w-[26ch] text-[clamp(1.6rem,1.15rem+1.8vw,2.3rem)] leading-tight font-bold tracking-[-0.02em]">
-            {c.question}
-          </h1>
-          <p className="text-[1.05rem]">{c.lede}</p>
+          <p className="eyebrow">Consultation · {c.oq}</p>
+          <h1 className="page-title">{c.question}</h1>
+          <p className="text-lg">{c.lede}</p>
+        </div>
 
-          <dl className="mt-6 grid grid-cols-1 gap-x-5 gap-y-1 border-y border-rule py-4 sm:grid-cols-[minmax(8rem,12rem)_1fr]">
-            <Fact term="Status">Opens when FPDS launches</Fact>
-            <Fact term="Open for">At least 14 days</Fact>
-            <Fact term="Who can answer">{c.whoCanAnswer}</Fact>
-            <Fact term="Time">About three minutes</Fact>
-            <Fact term="FPDS now">{c.fpdsNow}</Fact>
-          </dl>
+        <LayerCard className="mt-6 max-w-[40rem]">
+          <LayerCard.Primary className="p-5">
+            <dl className="m-0 grid grid-cols-1 gap-x-5 gap-y-1 sm:grid-cols-[minmax(8rem,11rem)_1fr]">
+              <Fact term="Status">
+                <Badge variant="neutral" icon={<ClockIcon />}>
+                  Opens when FPDS launches
+                </Badge>
+              </Fact>
+              <Fact term="Open for">At least 14 days</Fact>
+              <Fact term="Who can answer">{c.whoCanAnswer}</Fact>
+              <Fact term="Time">About three minutes</Fact>
+              <Fact term="FPDS now">{c.fpdsNow}</Fact>
+            </dl>
+          </LayerCard.Primary>
+        </LayerCard>
 
+        <div className="prose-block">
           {c.sections.map((section) => (
             <section key={section.heading}>
               <h2 className="section-heading">{section.heading}</h2>
@@ -36,21 +45,23 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
           ))}
         </div>
 
-        <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(16rem,1fr))] gap-4">
-          <Side heading={c.forHeading} items={c.caseFor} />
-          <Side heading={c.againstHeading} items={c.caseAgainst} />
+        <div className="mt-6 mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Side heading={c.forHeading} items={c.caseFor} kind="for" />
+          <Side heading={c.againstHeading} items={c.caseAgainst} kind="against" />
         </div>
 
         <div className="prose-block">
           <h2 className="section-heading">The options</h2>
-          <ol className="mb-4 list-none p-0">
+          <ol className="!mb-4 !list-none space-y-2.5 !pl-0">
             {c.options.map((option) => (
-              <li key={option.label} className="mb-2.5 border border-rule bg-field px-4 py-3">
-                <strong className="block">{option.label}</strong> {option.text}
+              <li key={option.label} className="!m-0">
+                <LayerCard className="px-4 py-3">
+                  <strong className="block text-kumo-strong">{option.label}</strong> {option.text}
+                </LayerCard>
               </li>
             ))}
           </ol>
-          {c.optionsNote ? <p className="small-print">{c.optionsNote}</p> : null}
+          {c.optionsNote ? <p className="text-sm text-kumo-subtle">{c.optionsNote}</p> : null}
 
           <h2 className="section-heading">Give your answer</h2>
           {c.tallyFormId ? (
@@ -61,12 +72,15 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
               className="mb-4 h-[900px] w-full border-0"
             />
           ) : (
-            <div className="mb-4 border border-dashed border-rule bg-field p-6 text-ink-soft">
-              The form opens when the consultation opens.
-            </div>
+            <Banner
+              variant="secondary"
+              icon={<ClockIcon weight="fill" />}
+              title="The form opens when the consultation opens."
+              className="mb-4"
+            />
           )}
-          <p className="small-print">
-            Read the <Link to="/consult/privacy/">privacy notice</Link> before you answer. {c.answerNote}
+          <p className="text-sm text-kumo-subtle">
+            Read the <Link href="/consult/privacy/">privacy notice</Link> before you answer. {c.answerNote}
           </p>
 
           <h2 className="section-heading">What happens next</h2>
@@ -77,12 +91,12 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
               reasons on each side. It does not show names.
             </li>
             <li>
-              We record the decision and its reasons in the <a href={DECISIONS_URL}>decision log</a>.
+              We record the decision and its reasons in the <Link href={DECISIONS_URL}>decision log</Link>.
             </li>
           </ol>
-          <p className="small-print">
+          <p className="text-sm text-kumo-subtle">
             Developers can also discuss this question on{" "}
-            <a href={`https://github.com/fpds-football/spec/discussions?discussions_q=${c.oq}`}>GitHub</a>.
+            <Link href={`https://github.com/fpds-football/spec/discussions?discussions_q=${c.oq}`}>GitHub</Link>.
           </p>
         </div>
       </main>
@@ -90,26 +104,32 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
   );
 }
 
-function Fact({ term, children }: { term: string; children: string }) {
+function Fact({ term, children }: { term: string; children: React.ReactNode }) {
   return (
     <>
-      <dt className="text-[0.92rem] text-ink-soft">{term}</dt>
-      <dd className="mb-2.5 sm:mb-0">{children}</dd>
+      <dt className="text-sm text-kumo-subtle sm:py-1">{term}</dt>
+      <dd className="m-0 mb-2.5 sm:mb-0 sm:py-1">{children}</dd>
     </>
   );
 }
 
-function Side({ heading, items }: { heading: string; items: string[] }) {
+function Side({ heading, items, kind }: { heading: string; items: string[]; kind: "for" | "against" }) {
+  const Icon = kind === "for" ? CheckCircleIcon : XCircleIcon;
   return (
-    <section className="border border-rule bg-field px-5 pt-4 pb-1.5">
-      <h3 className="mb-2 text-base font-semibold">{heading}</h3>
-      <ul className="mb-4 list-disc pl-5">
-        {items.map((item) => (
-          <li key={item} className="mb-1.5">
-            {item}
-          </li>
-        ))}
-      </ul>
-    </section>
+    <LayerCard>
+      <LayerCard.Secondary>
+        <h3 className="m-0 flex items-center gap-2 font-semibold">
+          <Icon aria-hidden="true" weight="fill" className={kind === "for" ? "text-kumo-success" : "text-kumo-danger"} />
+          {heading}
+        </h3>
+      </LayerCard.Secondary>
+      <LayerCard.Primary className="p-5">
+        <ul className="mb-0 list-disc space-y-1.5 pl-5">
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </LayerCard.Primary>
+    </LayerCard>
   );
 }

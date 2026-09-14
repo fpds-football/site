@@ -18,6 +18,14 @@ This repository is the website at `https://fpds.football`. The specification is 
 - Storage is session storage only. Do not use local storage or IndexedDB for player data.
 - Test each new behaviour in `tests/builder.spec.ts`, and validate exported files with `@fpds-football/fpds`.
 
+## Components
+
+- Use Kumo components (`@cloudflare/kumo`) and Kumo semantic colour tokens. Do not use raw Tailwind colours or hex values.
+- Import icons from `@phosphor-icons/react`. In components that render on the server, import from `@phosphor-icons/react/dist/ssr`.
+- Kumo `Select` names its trigger from `label` only when `label` is a string. When `label` is a React node, also pass `aria-label`.
+- Kumo renders a hidden native checkbox next to each checkbox. In tests, find checkboxes by role, not by label.
+- The page tests fail on a Content Security Policy violation. Do not use a Kumo component that renders inline styles on the server.
+
 ## Content
 
 - All text is Simple English (ASD-STE100, pragmatic mode), with British spelling. Use the `simple-english` skill. The homepage headline keeps its voice.
