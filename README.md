@@ -32,6 +32,8 @@ This repository does not serve the schema. `fpds-football/spec` serves `https://
 
 `scripts/csp-headers.mjs` runs after `vite build`. It writes `dist/client/_headers` with a Content Security Policy for each prerendered page. The policy permits the inline scripts of that page by SHA-256 hash, and no other inline script. It permits network requests only to this site, and frames only from Tally.
 
+`src/server.ts` wraps the TanStack Start handler. The Worker runs only when no static file matches. It returns 404 at once for a path with a file extension, and it adds basic security headers to its own responses, because Cloudflare applies `_headers` only to static files.
+
 A browser hashes script text after HTML parsing. The parser changes each NUL character to U+FFFD, and TanStack Start puts NUL characters in its hydration script. The script hashes the text in the same way.
 
 ## Development

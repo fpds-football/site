@@ -71,3 +71,19 @@ test("an unknown page shows the not found page", async ({ page }) => {
   await page.goto("/does-not-exist/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("This page does not exist.");
 });
+
+test("a file path that does not exist returns 404 without a redirect", async ({ request }) => {
+  for (const path of ["/something.json", "/schema/v0.1/player.json", "/consult/wages/file.pdf"]) {
+    const response = await request.get(path, { maxRedirects: 0 });
+    expect(response.status(), path).toBe(404);
+    expect(response.headers().location, path).toBeUndefined();
+    expect(response.headers()["x-content-type-options"], path).toBe("nosniff");
+  }
+});
+
+test("a page that does not exist has security headers", async ({ request }) => {
+  const response = await request.get("/does-not-exist/");
+  expect(response.status()).toBe(404);
+  expect(response.headers()["x-content-type-options"]).toBe("nosniff");
+  expect(response.headers()["x-frame-options"]).toBe("DENY");
+});
