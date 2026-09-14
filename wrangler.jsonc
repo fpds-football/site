@@ -1,0 +1,9 @@
+// Cloudflare Workers configuration for https://fpds.football.
+// The spec repository serves https://fpds.football/schema/* through a route on its own Worker (DECISIONS.md D-32).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fpds-site",
+  "compatibility_date": "2026-09-14",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry"
+}

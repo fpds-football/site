@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f6f7f9;
+  --color-ink: #10141a;
+  --color-ink-soft: #545c68;
+  --color-rule: #d6dbe2;
+  --color-verified: #14577f;
+  --color-stated: #85631a;
+  --color-field: #ffffff;
+
+  --font-sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  a {
+    @apply text-verified underline decoration-1 underline-offset-2;
+  }
+
+  a:focus-visible {
+    @apply rounded-[1px] outline-2 outline-offset-3 outline-verified;
+  }
+
+  code {
+    @apply font-mono text-[0.86em];
+  }
+}
+
+@layer components {
+  .wrap {
+    @apply mx-auto max-w-[60rem] px-6;
+  }
+
+  .prose-block {
+    @apply max-w-[40rem];
+  }
+
+  .prose-block p {
+    @apply mb-4;
+  }
+
+  .prose-block ul,
+  .prose-block ol {
+    @apply mb-4 pl-5;
+  }
+
+  .prose-block ul {
+    @apply list-disc;
+  }
+
+  .prose-block ol {
+    @apply list-decimal;
+  }
+
+  .prose-block li {
+    @apply mb-1.5;
+  }
+
+  .section-heading {
+    @apply mt-10 mb-3 text-[1.1rem] font-semibold tracking-[-0.01em];
+  }
+
+  .small-print {
+    @apply text-[0.92rem] text-ink-soft;
+  }
+}
