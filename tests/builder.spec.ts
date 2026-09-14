@@ -103,6 +103,34 @@ test("a video link goes into the export, and a link that is not https shows the 
   expect(document.media).toEqual([{ type: "video", video_type: "full_match", url: "https://video.example/okoye-v-leeds" }]);
 });
 
+test("the file view shows the file that the export makes", async ({ page }) => {
+  await fillFreeAgent(page);
+  await expect(page.getByTestId("file-view")).toHaveCount(0);
+
+  await page.getByRole("tab", { name: "The file" }).click();
+  const contents = page.getByRole("region", { name: "File contents" });
+  await expect(contents).toContainText('"full_name": "Daniel Okoye"');
+  await expect(contents).toContainText('"submission_id": "(a new ID when you export)"');
+
+  await expect(contents).toContainText('"submitted_at": "(the time when you export)"');
+
+  // Apart from the placeholder ID and time, the text is the exported file.
+  const shown = JSON.parse((await contents.innerText()).trim());
+  const { document } = await exportDocument(page);
+  const { submission_id, submitted_at } = document.submission;
+  expect({ ...shown, submission: { ...shown.submission, submission_id, submitted_at } }).toEqual(document);
+
+  // A value that does not apply is not in the file.
+  await section(page, "Contract");
+  await choose(page, "Contract status", /^Under contract/);
+  await expect(page.getByTestId("file-view")).toContainText("The file is not complete.");
+  await choose(page, "Contract status", /^Free agent/);
+  await expect(contents).not.toContainText("expiry_date");
+
+  await page.getByRole("tab", { name: "How a club sees it" }).click();
+  await expect(page.getByRole("article", { name: "Submission preview" })).toBeVisible();
+});
+
 test("each export of the same draft has a new submission ID", async ({ page }) => {
   await fillFreeAgent(page);
   const first = await exportDocument(page);

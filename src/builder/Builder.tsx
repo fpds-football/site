@@ -1,4 +1,4 @@
-import { Badge, Banner, Button, Dialog, LayerCard } from "@cloudflare/kumo";
+import { Badge, Banner, Button, Dialog, LayerCard, Tabs } from "@cloudflare/kumo";
 import { labelFor } from "@fpds-football/fpds";
 import {
   ArrowLeftIcon,
@@ -17,6 +17,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { SubmissionView } from "~/components/SubmissionView";
 import { buildExport, exportFileName } from "./export";
+import { FileView } from "./FileView";
 import { SectionForm } from "./SectionForms";
 import { SECTIONS, type SectionId, sectionFor } from "./sections";
 import { downloadFile, draftFileContents, draftFileName, readOpenedFile } from "./storage";
@@ -39,6 +40,7 @@ export function Builder() {
   const [section, setSection] = useState<SectionId>("submission");
   const [message, setMessage] = useState<string>();
   const [confirmClear, setConfirmClear] = useState(false);
+  const [preview, setPreview] = useState<"club" | "file">("club");
   const fileInput = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const { exportResult } = builder;
@@ -277,10 +279,26 @@ export function Builder() {
               ))}
             </LayerCard.Primary>
           </LayerCard>
-          <p className="mb-2 flex items-center gap-2 text-sm text-kumo-subtle">
-            How a club sees this submission <Badge variant="neutral">Preview</Badge>
-          </p>
-          <SubmissionView document={exportResult.document ?? exportResult.preview} isMinor={builder.isMinor} />
+          <Tabs
+            className="mb-3"
+            size="sm"
+            tabs={[
+              { value: "club", label: "How a club sees it" },
+              { value: "file", label: "The file" },
+            ]}
+            value={preview}
+            onValueChange={(value) => setPreview(value === "file" ? "file" : "club")}
+          />
+          {preview === "club" ? (
+            <>
+              <p className="mb-2 flex items-center gap-2 text-sm text-kumo-subtle">
+                How a club sees this submission <Badge variant="neutral">Preview</Badge>
+              </p>
+              <SubmissionView document={exportResult.document ?? exportResult.preview} isMinor={builder.isMinor} />
+            </>
+          ) : (
+            <FileView document={exportResult.document ?? exportResult.preview} complete={exportResult.valid} />
+          )}
           <p className="mt-2 text-xs text-kumo-subtle">
             FPDS checks the structure of a submission. It does not check that the information is true.
           </p>
