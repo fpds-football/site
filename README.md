@@ -1,13 +1,13 @@
 # fpds.football
 
-The website of the [Football Player Data Standard (FPDS)](https://github.com/fpds-football/spec): the homepage, the consultations, and later the submission builder and viewer.
+The website of the [Football Player Data Standard (FPDS)](https://github.com/fpds-football/spec): the homepage, the consultations, the submission builder and the submission viewer.
 
 ## What the site does
 
 - **Homepage.** Explains FPDS and links to the specification, the schema and the consultations.
 - **Consultations.** One page for each open consultation. Agents, clubs and players answer in a Tally form. `src/content/consultations.ts` contains each consultation as data.
 - **Builder** at `/build/`. A person fills in a form and exports a file that ends with `.fpds.json`. The builder runs only in the browser. Player data never goes to a server.
-- **Viewer.** Not built yet.
+- **Viewer** at `/view/`. A club opens a `.fpds.json` file and sees the submission, the source of each value, and any problems with the file. The viewer runs only in the browser. The file never leaves the browser.
 
 This repository does not serve the schema. `fpds-football/spec` serves `https://fpds.football/schema/*`, so the permanent schema URL does not depend on this site.
 
@@ -24,9 +24,23 @@ This repository does not serve the schema. `fpds-football/spec` serves `https://
 - `src/builder/useBuilder.ts` gets the state of each field, the conflicts and the export result from `@fpds-football/fpds`. The builder contains no FPDS rules of its own.
 - `src/builder/export.ts` removes empty values and values that do not apply, removes provenance for missing values, and calls `prepareDocument`. Each export makes a new submission ID.
 - `src/builder/storage.ts` saves work in session storage, which the browser deletes when the tab closes. It also reads and writes draft files that end with `.fpds-draft.json`.
-- `src/components/SubmissionView.tsx` shows a submission as a club sees it, with the source of each value. The viewer will use it too.
+- `src/components/SubmissionView.tsx` shows a submission as a club sees it, with the source of each value. The viewer uses it too.
 
 `tests/builder.spec.ts` exports real files and validates them with `@fpds-football/fpds`. It also makes sure that the builder sends no request except for static files from this site.
+
+## How the viewer works
+
+- `src/viewer/openFile.ts` sorts a file into one of four results: a document, a draft, an unsupported version, or a refusal (not JSON, or not FPDS). It uses `readOpenedFile` from the builder and `validate` from `@fpds-football/fpds`.
+- `src/viewer/Viewer.tsx` shows the result (DECISIONS.md D-37 in the spec repository):
+  - A document with errors shows under a red "Not a valid FPDS submission" banner, with the messages from the library. Warnings show in a separate banner and do not make the file invalid.
+  - If `is_minor` does not agree with the date of birth, the card shows the value in the file and the calculated value, with the age from `calculated.age`. The minor badge shows if the file or the date of birth says that the player is a minor.
+  - Extensions show in a closed section, grouped by prefix, without source marks.
+  - A draft file, an unsupported version and a file that is not FPDS show no fields.
+- "Edit in builder" writes the document to the session storage of the builder, without `fpds_version`, `submission_id`, `submitted_at` and `consent.is_minor`. The export from the builder then has a new submission ID. If the builder already has work in the tab, the viewer asks first.
+- "Print or save as PDF" uses the print styles in `src/styles/app.css` and `print:` utilities. Controls do not print. Source badges keep their colours and get a solid border (checked source) or a dashed border (stated source).
+- The page never shows a badge such as "Verified by FPDS". Each submission has the note "FPDS checks the structure of this file. It does not check that the information is true."
+
+`tests/viewer.spec.ts` opens the fixtures in `tests/fixtures/` and checks each result. It also checks that opening a file sends no request except for static files from this site, and that the page causes no Content Security Policy violation.
 
 ## Security headers
 

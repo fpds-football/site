@@ -127,17 +127,19 @@ function Home() {
               PDF now.
             </HowStep>
             <HowStep number={3} title="The club reads it">
-              The club opens the file in software that supports FPDS. A free viewer on this site is coming soon. It shows
-              the player, the source of each value, and any problems with the file.
+              The club opens the file in the free <Link href="/view/">viewer</Link> on this site, or in software that
+              supports FPDS. The viewer shows the player, the source of each value, and any problems with the file. The
+              file never leaves the browser.
             </HowStep>
           </ol>
         </section>
 
-        <nav aria-label="Main links" className="mb-12 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Door href={SPEC_URL} title="Read the specification" note="The normative document, in fourteen sections" />
-          <Door href="/schema/v0.1/player.json" title="Get the schema" note="JSON Schema 2020-12, at a permanent URL" />
-          <Door href="/build/" title="Create a submission" note="In your browser. Your data stays on your device." />
-          <Door href="/consult/" title="Take part" note="Help decide what goes into FPDS" />
+        <nav aria-label="Main links" className="mb-12 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+          <Door href="/build/" title="Create a submission" note="In your browser. Your data stays on your device." className="lg:col-span-3" />
+          <Door href="/view/" title="View a submission" note="Open a file from an agent. The file stays on your device." className="lg:col-span-3" />
+          <Door href={SPEC_URL} title="Read the specification" note="The normative document, in fourteen sections" className="lg:col-span-2" />
+          <Door href="/schema/v0.1/player.json" title="Get the schema" note="JSON Schema 2020-12, at a permanent URL" className="lg:col-span-2" />
+          <Door href="/consult/" title="Take part" note="Help decide what goes into FPDS" className="sm:col-span-2 lg:col-span-2" />
         </nav>
 
         <div className="prose-block">
@@ -236,9 +238,9 @@ function Claim({ label, value, mark, kind }: { label: string; value: string; mar
   );
 }
 
-function Door({ title, note, href }: { title: string; note: string; href: string }) {
+function Door({ title, note, href, className = "" }: { title: string; note: string; href: string; className?: string }) {
   return (
-    <Link href={href} variant="plain" className="block no-underline">
+    <Link href={href} variant="plain" className={`block no-underline ${className}`}>
       <LayerCard className="group h-full p-4 transition-colors hover:bg-kumo-tint">
         <span className="flex items-center justify-between gap-2 font-semibold text-kumo-link">
           {title}

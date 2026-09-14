@@ -5,7 +5,7 @@ This repository is the website at `https://fpds.football`. The specification is 
 ## Hard rules
 
 - **Do not serve `/schema/*` from this site.** The `spec` Worker serves it through a Cloudflare route. The prerender filter excludes it.
-- **Player data never goes to a server** (DECISIONS.md D-33 to D-37 in the spec repository). The builder and the viewer run only in the browser. Do not add a server function, an API route, analytics or a third-party script to those pages.
+- **Player data never goes to a server** (DECISIONS.md D-33 to D-37 in the spec repository). The builder at `/build/` and the viewer at `/view/` run only in the browser. Do not add a server function, an API route, analytics or a third-party script to those pages.
 - **Do not weaken the Content Security Policy.** Do not add `'unsafe-inline'` or `'unsafe-eval'`. If a new inline script is necessary, the build hashes it. `connect-src` stays `'self'`.
 - **Do not put rules about FPDS documents in this repository.** Use `getFieldStates`, `validate` and `prepareDocument` from `@fpds-football/fpds`.
 - **The specification is the authority.** If the site and `SPEC.md` disagree, tell the user.
@@ -17,6 +17,16 @@ This repository is the website at `https://fpds.football`. The specification is 
 - A value in a field that does not apply stays in the draft, but the export does not include it.
 - Storage is session storage only. Do not use local storage or IndexedDB for player data.
 - Test each new behaviour in `tests/builder.spec.ts`, and validate exported files with `@fpds-football/fpds`.
+- `SubmissionView` is shared with the viewer. It gets the source of each value from the most specific provenance entry (§11.1). In a narrow card, its rows stack by a container query.
+
+## Viewer
+
+- The viewer shows a file. It does not change the file. "Edit in builder" gives the builder a copy through session storage, and the builder export makes a new version (§4.3).
+- Show every problem from `validate`. Do not write FPDS messages or rules in the site. The minor status and the age come from `calculated`.
+- Never show a badge or text that says that FPDS verified the information. Each rendered submission keeps the note about structure.
+- Extensions are not part of FPDS. Keep them in the closed section, without source marks.
+- A draft file, an unsupported version and a file that is not FPDS show no fields.
+- Test each new behaviour in `tests/viewer.spec.ts` with a fixture in `tests/fixtures/`.
 
 ## Components
 
