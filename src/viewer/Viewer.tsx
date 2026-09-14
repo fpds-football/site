@@ -1,5 +1,6 @@
 import { Banner, Button, Dialog } from "@cloudflare/kumo";
 import {
+  ArrowDownIcon,
   FileArrowUpIcon,
   FileTextIcon,
   FolderOpenIcon,
@@ -11,10 +12,12 @@ import {
   WarningIcon,
 } from "@phosphor-icons/react";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type Issue } from "@fpds-football/fpds";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { clean, type Draft } from "~/builder/draft";
 import { loadSession, saveSession } from "~/builder/storage";
-import { SubmissionView } from "~/components/SubmissionView";
+import { anchorFor, SubmissionView } from "~/components/SubmissionView";
+import exampleText from "./example.fpds.json?raw";
 import { readViewedFile, type ViewedFile } from "./openFile";
 
 interface Opened {
@@ -34,13 +37,18 @@ export function Viewer() {
   const resultRef = useRef<HTMLHeadingElement>(null);
   const navigate = useNavigate();
 
-  const open = useCallback(async (file: File | undefined) => {
-    if (!file) return;
-    const text = await file.text();
-    setOpened({ fileName: file.name, file: readViewedFile(text) });
+  const show = useCallback((fileName: string, text: string) => {
+    setOpened({ fileName, file: readViewedFile(text) });
     if (fileInput.current) fileInput.current.value = "";
     requestAnimationFrame(() => resultRef.current?.focus());
   }, []);
+
+  const open = useCallback(
+    async (file: File | undefined) => {
+      if (file) show(file.name, await file.text());
+    },
+    [show],
+  );
 
   // The full page accepts a dropped file. Without this, the browser opens the file itself and leaves the page.
   useEffect(() => {
@@ -152,7 +160,7 @@ export function Viewer() {
             <div role="status" aria-live="polite" className="mb-4 empty:hidden">
               {file ? <Refusal file={file} fileName={opened?.fileName ?? ""} onOpenBuilder={openBuilder} /> : null}
             </div>
-            <DropZone dragging={dragging} onChoose={chooseFile} />
+            <DropZone dragging={dragging} onChoose={chooseFile} onExample={() => show(EXAMPLE_FILE_NAME, exampleText)} />
           </>
         )}
       </div>
@@ -176,7 +184,10 @@ export function Viewer() {
   );
 }
 
-function DropZone({ dragging, onChoose }: { dragging: boolean; onChoose: () => void }) {
+/** The example is part of the page script, so opening it sends no request. It is a copy of an example in the spec repository. */
+const EXAMPLE_FILE_NAME = "example-tomasz-wojcik.fpds.json";
+
+function DropZone({ dragging, onChoose, onExample }: { dragging: boolean; onChoose: () => void; onExample: () => void }) {
   return (
     <>
       <div
@@ -190,10 +201,16 @@ function DropZone({ dragging, onChoose }: { dragging: boolean; onChoose: () => v
         <p className="m-0 text-lg font-semibold text-kumo-strong">
           {dragging ? "Drop the file to open it" : "Open an .fpds.json file"}
         </p>
-        <p className="m-0 max-w-[26rem] text-sm text-kumo-subtle pointer-coarse:hidden">Drag the file here, or choose it on your device.</p>
+        <p className="m-0 max-w-[26rem] text-sm text-kumo-subtle">Choose the file on your device, or drag it here.</p>
         <Button variant="primary" size="lg" icon={<FolderOpenIcon />} onClick={onChoose}>
           Choose a file
         </Button>
+        <p className="m-0 text-sm text-kumo-subtle">
+          No file?{" "}
+          <button type="button" onClick={onExample} className="cursor-pointer font-medium text-kumo-link underline decoration-1 underline-offset-2">
+            Open an example
+          </button>
+        </p>
       </div>
       <p className="mt-4 max-w-[40rem] text-sm text-kumo-subtle">
         The viewer checks the structure of the file against FPDS. It shows the source of each value, a badge for a minor, and
@@ -212,6 +229,17 @@ function Refusal({
   fileName: string;
   onOpenBuilder: (draft: Draft) => void;
 }) {
+  // Every refusal names the file, so a person who opens many files knows which file the message is about.
+  const describe = (message: string, action?: ReactNode) => (
+    <>
+      <span data-testid="refused-file" className="block font-mono text-xs break-all opacity-80">
+        {fileName}
+      </span>
+      <span className="block">{message}</span>
+      {/* The action goes below the text. Next to the text, it squeezes the text into a narrow column on a phone. */}
+      {action ? <span className="mt-2.5 block">{action}</span> : null}
+    </>
+  );
   const icon = <WarningCircleIcon weight="fill" />;
   switch (file.kind) {
     case "draft":
@@ -220,8 +248,12 @@ function Refusal({
           data-testid="refusal"
           icon={<InfoIcon weight="fill" />}
           title="This is a draft from the builder, not a submission."
-          description={`${fileName} contains unfinished work. Open it in the builder to continue, then export the submission.`}
-          action={<Banner.Action onClick={() => onOpenBuilder(file.draft)}>Open in builder</Banner.Action>}
+          description={describe(
+            "The file contains unfinished work. Open it in the builder to continue, then export the submission.",
+            <Button variant="primary" icon={<PencilSimpleIcon />} onClick={() => onOpenBuilder(file.draft)}>
+              Open in builder
+            </Button>,
+          )}
         />
       );
     case "unsupported":
@@ -231,11 +263,11 @@ function Refusal({
           variant="error"
           icon={icon}
           title="This viewer cannot show this file."
-          description={`${file.message} Ask the sender for a file in a supported version.`}
+          description={describe(`${file.message} Ask the sender for a file in a supported version.`)}
         />
       );
     case "refused":
-      return <Banner data-testid="refusal" variant="error" icon={icon} title={file.title} description={file.message} />;
+      return <Banner data-testid="refusal" variant="error" icon={icon} title={file.title} description={describe(file.message)} />;
   }
 }
 
@@ -265,23 +297,18 @@ function DocumentResult({
 
   return (
     <>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="m-0 flex min-w-0 items-center gap-2 text-sm">
+      {/* On a phone, the file name has its own line, and the buttons share one line with short labels. */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <p className="m-0 flex min-w-0 basis-full items-center gap-2 text-sm sm:flex-1 sm:basis-auto">
           <FileTextIcon aria-hidden="true" className="shrink-0 text-kumo-subtle" />
           <span data-testid="file-name" className="truncate font-medium text-kumo-strong">
             {fileName}
           </span>
         </p>
-        <div className="flex flex-wrap gap-2 print:hidden">
-          <Button icon={<FolderOpenIcon />} onClick={onOpenAnother}>
-            Open another file
-          </Button>
-          <Button icon={<PencilSimpleIcon />} onClick={onEdit}>
-            Edit in builder
-          </Button>
-          <Button icon={<PrinterIcon />} onClick={() => window.print()}>
-            Print or save as PDF
-          </Button>
+        <div data-testid="toolbar" className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:shrink-0 print:hidden">
+          <ToolbarButton icon={<FolderOpenIcon />} label="Open another file" short="Open" onClick={onOpenAnother} />
+          <ToolbarButton icon={<PencilSimpleIcon />} label="Edit in builder" short="Edit" onClick={onEdit} />
+          <ToolbarButton icon={<PrinterIcon />} label="Print or save as PDF" short="Print" onClick={() => window.print()} />
         </div>
       </div>
 
@@ -294,12 +321,8 @@ function DocumentResult({
             title="Not a valid FPDS submission"
             description={
               <>
-                <span className="block">This file has these problems. Some information below can be missing or wrong.</span>
-                <ul className="mt-1.5 mb-0 list-disc space-y-1 pl-5">
-                  {errors.map((issue) => (
-                    <li key={`${issue.code}${issue.path}`}>{issue.message}</li>
-                  ))}
-                </ul>
+                <span className="block">Each problem also shows at its place in the submission. Select a problem to go to it.</span>
+                <IssueList issues={errors} />
               </>
             }
           />
@@ -309,15 +332,11 @@ function DocumentResult({
             data-testid="warnings"
             variant="alert"
             icon={<WarningIcon weight="fill" />}
-            title="Check these warnings"
+            title={warnings.length === 1 ? "Check this warning" : "Check these warnings"}
             description={
               <>
                 <span className="block">A warning does not make the file invalid.</span>
-                <ul className="mt-1.5 mb-0 list-disc space-y-1 pl-5">
-                  {warnings.map((issue) => (
-                    <li key={`${issue.code}${issue.path}`}>{issue.message}</li>
-                  ))}
-                </ul>
+                <IssueList issues={warnings} />
               </>
             }
           />
@@ -332,7 +351,61 @@ function DocumentResult({
         </p>
       </div>
 
-      <SubmissionView document={document} isMinor={isMinor} minorNote={minorNote} />
+      <SubmissionView document={document} isMinor={isMinor} minorNote={minorNote} issues={result.issues} />
     </>
   );
+}
+
+/** The full label is the accessible name at every width. A phone shows a short label. */
+function ToolbarButton({ icon, label, short, onClick }: { icon: ReactNode; label: string; short: string; onClick: () => void }) {
+  return (
+    <Button icon={icon} onClick={onClick} className="w-full justify-center sm:w-auto">
+      <span aria-hidden="true" className="sm:hidden">
+        {short}
+      </span>
+      <span className="max-sm:sr-only">{label}</span>
+    </Button>
+  );
+}
+
+/** A list of problems. A problem with a place in the submission is a link to that place. */
+function IssueList({ issues }: { issues: Issue[] }) {
+  return (
+    // No list markers: a marker lines up with the last line of a wrapped button, not the first.
+    <ul className="mt-1.5 mb-0 list-none space-y-1 pl-0">
+      {issues.map((issue) => {
+        const anchor = anchorFor(issue.path);
+        return (
+          <li key={`${issue.code}${issue.path}`}>
+            {anchor ? (
+              <button
+                type="button"
+                onClick={() => goTo(anchor)}
+                className="group/issue flex cursor-pointer items-start gap-1.5 text-left underline decoration-current/30 decoration-1 underline-offset-2 hover:decoration-current"
+              >
+                <ArrowDownIcon aria-hidden="true" className="mt-1 shrink-0 transition-transform group-hover/issue:translate-y-0.5" />
+                {issue.message}
+              </button>
+            ) : (
+              <span className="flex items-start gap-1.5 pl-5">{issue.message}</span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** Moves to a place in the submission. A place inside a closed section opens the section first. */
+function goTo(anchor: string) {
+  const target = window.document.querySelector<HTMLElement>(`[data-anchor="${CSS.escape(anchor)}"]`);
+  if (!target) return;
+  const details = target.closest("details");
+  if (details) details.open = true;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+  target.focus({ preventScroll: true });
+  // A short highlight shows where the problem is. The focus stays, for screen readers.
+  target.dataset.highlight = "";
+  setTimeout(() => delete target.dataset.highlight, 1600);
 }

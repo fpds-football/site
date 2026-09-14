@@ -75,6 +75,16 @@ test("an invalid file shows the submission under a red banner, with the problem 
   await expect(page.getByRole("article", { name: "Submission preview" })).toContainText("Tomasz Andrzej Wojcik");
   await expect(page.getByTestId("structure-note")).toBeVisible();
   await expect(page.getByText("The viewer found no problems")).toHaveCount(0);
+
+  // The missing value has a row, with the problem next to it.
+  const expiry = row(page, "Contract expires");
+  await expect(expiry).toContainText("Not in the file");
+  await expect(expiry.getByTestId("issue-notes")).toContainText("Contract expiry date is required");
+
+  // The problem in the banner is a link to that row.
+  await banner.getByRole("button", { name: /Contract expiry date is required/ }).click();
+  await expect(expiry).toBeFocused();
+  await expect(expiry).toBeInViewport();
 });
 
 test("a minor status that does not agree with the date of birth shows the calculated status and age", async ({ page }) => {
@@ -133,6 +143,8 @@ test("extensions appear in a closed section by prefix, and a possible medical ex
 
   const extensions = page.getByTestId("extensions");
   await expect(extensions).not.toHaveAttribute("open");
+  // The closed section says that it contains a warning.
+  await expect(extensions.locator("summary")).toContainText("1 warning");
   await expect(extensions.getByText("B+")).toBeHidden();
   await extensions.getByText("Extra information from other software").click();
   await expect(extensions.getByRole("region", { name: "com.example" })).toContainText("scouting_grade");
@@ -140,6 +152,45 @@ test("extensions appear in a closed section by prefix, and a possible medical ex
   await expect(extensions.getByRole("region", { name: "uk.co.example" })).toContainText('"gbe_points": 15');
   // No source marks inside the section.
   await expect(extensions.getByText(/Stated by|Verified|Data provider/)).toHaveCount(0);
+  // The warning shows next to the extension that it is about.
+  await expect(extensions.locator('[data-anchor="/extensions/uk.co.example~1injury_history"]')).toContainText("can contain medical information");
+});
+
+test("the link on a warning opens the closed extensions section at that extension", async ({ page }) => {
+  await openFile(page, "with-extensions.fpds.json");
+  await page.getByTestId("warnings").getByRole("button", { name: /injury_history/ }).click();
+  await expect(page.getByTestId("extensions")).toHaveAttribute("open");
+  await expect(page.locator('[data-anchor="/extensions/uk.co.example~1injury_history"]')).toBeFocused();
+});
+
+test("the example opens without a file", async ({ page }) => {
+  await page.getByRole("button", { name: "Open an example" }).click();
+  await expect(page.getByTestId("file-name")).toHaveText("example-tomasz-wojcik.fpds.json");
+  await expect(page.getByTestId("invalid-banner")).toHaveCount(0);
+  await expect(row(page, "Contract expires")).toContainText("Verified · FIFA TMS");
+});
+
+test("each refusal names the file", async ({ page }) => {
+  await openFile(page, "notes.txt", Buffer.from("not json"));
+  await expect(page.getByTestId("refused-file")).toHaveText("notes.txt");
+  await openFile(page, "unsupported-version.fpds.json");
+  await expect(page.getByTestId("refused-file")).toHaveText("unsupported-version.fpds.json");
+});
+
+test("the minor badge does not look like a source badge", async ({ page }) => {
+  await openFile(page, "academy-prospect-minor.fpds.json");
+  const background = (locator: ReturnType<Page["locator"]>) => locator.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const minor = await background(page.getByTestId("minor-badge").locator(":scope > *"));
+  const stated = await background(row(page, "Nationalities").getByText(/^Stated by/));
+  expect(minor).not.toBe(stated);
+});
+
+test("the toolbar buttons fit on one line, also on a phone", async ({ page }) => {
+  await openFile(page, "midfielder-under-contract.fpds.json");
+  const toolbar = page.getByTestId("toolbar");
+  expect((await toolbar.boundingBox())?.height ?? 0).toBeLessThan(48);
+  // The full label stays the accessible name when a phone shows a short label.
+  await expect(toolbar.getByRole("button", { name: "Print or save as PDF" })).toBeVisible();
 });
 
 test("Edit in builder opens the document in the builder, and the export has a new submission ID", async ({ page }) => {

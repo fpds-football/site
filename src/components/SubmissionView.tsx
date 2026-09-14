@@ -1,6 +1,6 @@
 import { Badge, LayerCard } from "@cloudflare/kumo";
-import { VALUE_LABELS } from "@fpds-football/fpds";
-import { WarningIcon } from "@phosphor-icons/react";
+import { type Issue, VALUE_LABELS } from "@fpds-football/fpds";
+import { ShieldWarningIcon, WarningCircleIcon, WarningIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { countryName } from "~/content/countries";
 
@@ -117,19 +117,65 @@ const SEASON_PARTS: [string, string][] = [
   ["clean_sheets", "CS"],
 ];
 
+/** The values that have their own row. A problem with a value inside one of them shows in that row. */
+const ROW_POINTERS = [
+  "/submission/purposes",
+  "/submission/sender",
+  "/submission/submitted_at",
+  "/submission/submission_id",
+  "/player/full_name",
+  "/player/date_of_birth",
+  "/player/nationalities",
+  "/player/current_club",
+  "/player/external_ids",
+  "/positions/primary_position",
+  "/positions/secondary_positions",
+  "/contract/status",
+  "/contract/expiry_date",
+  "/contract/parent_club",
+  "/representation",
+  "/consent/lawful_basis",
+  "/consent/consent_date",
+  "/consent/is_minor",
+];
+
+/** Values that show in the row of another value. */
+const SHARED_ROWS: Record<string, string> = {
+  "/player/full_name": "header",
+  "/consent/is_minor": "header",
+  "/consent/consent_date": "/consent/lawful_basis",
+};
+
+const escapeToken = (token: string) => token.replaceAll("~", "~0").replaceAll("/", "~1");
+
+/**
+ * The place in the card for a problem at a JSON Pointer: a row, a season, a section, an extension or the header.
+ * Returns undefined if the card has no place for it. The viewer uses the same value to link a problem to its place.
+ */
+export function anchorFor(path: string): string | undefined {
+  const [, first, second] = path.split("/");
+  if (first === "performance") return second === undefined ? "/performance" : /^\d+$/.test(second) ? `/performance/${second}` : undefined;
+  if (first === "extensions") return second === undefined ? "/extensions" : `/extensions/${second}`;
+  const row = ROW_POINTERS.find((pointer) => path === pointer || path.startsWith(`${pointer}/`));
+  return row && (SHARED_ROWS[row] ?? row);
+}
+
 /**
  * A submission as a club sees it, with the source of each value.
  * It shows what the document contains. It does not decide whether the document is valid.
+ * When `issues` are given, each problem shows at the value that it is about, and a missing value shows as "Not in the file".
  */
 export function SubmissionView({
   document,
   isMinor,
   minorNote,
+  issues = [],
 }: {
   document: Doc;
   isMinor?: boolean | undefined;
   /** A note under the minor badge, for example when the file and the date of birth do not agree. */
   minorNote?: string | undefined;
+  issues?: Issue[];
 }) {
   const submission = asRecord(document.submission);
   const player = asRecord(document.player);
@@ -141,6 +187,10 @@ export function SubmissionView({
   const representation = document.representation === undefined ? undefined : asRecord(document.representation);
   const performance = asArray(document.performance).map(asRecord);
   const extensions = asRecord(document.extensions);
+
+  const issuesAt = (anchor: string) => issues.filter((issue) => anchorFor(issue.path) === anchor);
+  // The minor note already explains a minor status that does not agree with the date of birth.
+  const headerIssues = issuesAt("header").filter((issue) => issue.code !== "minor_mismatch");
 
   const meta = [
     asText(positions.primary_position),
@@ -154,15 +204,20 @@ export function SubmissionView({
     return name && (country ? `${name}, ${countryName(country)}` : name);
   };
 
+  const row = (term: string, pointer: string, value: ReactNode, source?: Source | SourceGroup[]) => (
+    <Row term={term} anchor={pointer} value={value} source={source} issues={issuesAt(pointer)} />
+  );
+
   return (
     <LayerCard render={<article />} aria-label="Submission preview">
       <LayerCard.Secondary>
-        <div className="w-full min-w-0">
+        <div data-anchor="header" tabIndex={-1} className="w-full min-w-0 scroll-mt-4 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand">
           <div className="flex items-center justify-between gap-3">
             <span className="min-w-0 truncate text-lg font-semibold text-kumo-strong">{asText(player.full_name) || "Player name"}</span>
             {isMinor ? (
               <span data-testid="minor-badge" className="shrink-0">
-                <Badge variant="warning" icon={<WarningIcon weight="fill" />} className="print:border print:border-current">
+                {/* Purple is not used for sources, problems or warnings, so the minor status never looks like one of them. */}
+                <Badge variant="purple" icon={<ShieldWarningIcon weight="fill" />} className="font-semibold print:border print:border-current">
                   Minor
                 </Badge>
               </span>
@@ -170,72 +225,74 @@ export function SubmissionView({
           </div>
           {meta.length > 0 ? <p className="m-0 mt-0.5 text-sm text-kumo-subtle">{meta.join(" · ")}</p> : null}
           {minorNote ? (
-            <p data-testid="minor-note" className="m-0 mt-2 flex items-start gap-1.5 rounded-md bg-kumo-warning-tint px-2.5 py-1.5 text-sm font-medium text-kumo-strong">
-              <WarningIcon aria-hidden="true" weight="fill" className="mt-0.5 shrink-0 text-kumo-warning" />
+            <p
+              data-testid="minor-note"
+              className="m-0 mt-2 flex items-start gap-1.5 rounded-md border-l-4 border-kumo-badge-purple bg-kumo-base px-2.5 py-1.5 text-sm font-medium text-kumo-strong"
+            >
+              <ShieldWarningIcon aria-hidden="true" weight="fill" className="mt-0.5 shrink-0 text-kumo-badge-purple" />
               {minorNote}
             </p>
           ) : null}
+          <IssueNotes issues={headerIssues} />
         </div>
       </LayerCard.Secondary>
       <LayerCard.Primary className="@container p-4">
         <dl className="m-0 divide-y divide-kumo-hairline">
-          <Row term="Purposes" value={listOf(submission.purposes, (p) => label(VALUE_LABELS.purposes, p))} />
-          <Row term="Nationalities" value={listOf(player.nationalities, (code) => asText(code) && countryName(String(code)))} source={sourceOf(document, "/player/nationalities")} />
-          <Row term="Date of birth" value={formatDate(player.date_of_birth)} source={sourceOf(document, "/player/date_of_birth")} />
-          <Row
-            term="Primary position"
-            value={positionText(positions.primary_position)}
-            source={sourceOf(document, "/positions/primary_position")}
-          />
-          <Row term="Secondary positions" value={listOf(positions.secondary_positions)} source={sourceOf(document, "/positions/secondary_positions")} />
-          <Row term="Contract" value={label(VALUE_LABELS.contract_status, contract.status)} source={sourceOf(document, "/contract/status")} />
-          <Row term="Current club" value={clubText(currentClub)} source={sourcesOf(document, "/player/current_club", currentClub, CLUB_PARTS)} />
-          <Row term="Contract expires" value={formatDate(contract.expiry_date)} source={sourceOf(document, "/contract/expiry_date")} />
-          <Row term="Parent club" value={clubText(parentClub)} source={sourcesOf(document, "/contract/parent_club", parentClub, CLUB_PARTS)} />
-          <Row
-            term="Representation"
-            value={
-              representation
-                ? [
-                    asText(representation.agent_name),
-                    label(VALUE_LABELS.mandate_status, representation.mandate_status),
-                    asText(representation.fifa_agent_licence) && `licence ${representation.fifa_agent_licence}`,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ")
-                : undefined
-            }
-            source={representation && sourcesOf(document, "/representation", representation, REPRESENTATION_PARTS)}
-          />
-          <Row
-            term="FIFA Connect ID"
-            value={asText(asRecord(player.external_ids).fifa_connect_id)}
-            source={sourceOf(document, "/player/external_ids/fifa_connect_id")}
-          />
+          {row("Purposes", "/submission/purposes", listOf(submission.purposes, (p) => label(VALUE_LABELS.purposes, p)))}
+          {row("Nationalities", "/player/nationalities", listOf(player.nationalities, (code) => asText(code) && countryName(String(code))), sourceOf(document, "/player/nationalities"))}
+          {row("Date of birth", "/player/date_of_birth", formatDate(player.date_of_birth), sourceOf(document, "/player/date_of_birth"))}
+          {row("Primary position", "/positions/primary_position", positionText(positions.primary_position), sourceOf(document, "/positions/primary_position"))}
+          {row("Secondary positions", "/positions/secondary_positions", listOf(positions.secondary_positions), sourceOf(document, "/positions/secondary_positions"))}
+          {row("Contract", "/contract/status", label(VALUE_LABELS.contract_status, contract.status), sourceOf(document, "/contract/status"))}
+          {row("Current club", "/player/current_club", clubText(currentClub), sourcesOf(document, "/player/current_club", currentClub, CLUB_PARTS))}
+          {row("Contract expires", "/contract/expiry_date", formatDate(contract.expiry_date), sourceOf(document, "/contract/expiry_date"))}
+          {row("Parent club", "/contract/parent_club", clubText(parentClub), sourcesOf(document, "/contract/parent_club", parentClub, CLUB_PARTS))}
+          {row(
+            "Representation",
+            "/representation",
+            representation
+              ? [
+                  asText(representation.agent_name),
+                  label(VALUE_LABELS.mandate_status, representation.mandate_status),
+                  asText(representation.fifa_agent_licence) && `licence ${representation.fifa_agent_licence}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
+              : undefined,
+            representation && sourcesOf(document, "/representation", representation, REPRESENTATION_PARTS),
+          )}
+          {row("FIFA Connect ID", "/player/external_ids", asText(asRecord(player.external_ids).fifa_connect_id), sourceOf(document, "/player/external_ids/fifa_connect_id"))}
         </dl>
 
-        {performance.length > 0 ? (
-          <section aria-label="Performance" className="mt-4">
+        {performance.length > 0 || issuesAt("/performance").length > 0 ? (
+          <section aria-label="Performance" data-anchor="/performance" tabIndex={-1} className="mt-4 scroll-mt-4 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand">
             <h3 className="mb-2 text-sm font-semibold text-kumo-strong">Performance</h3>
+            <IssueNotes issues={issuesAt("/performance")} />
             <ul className="m-0 list-none space-y-2 p-0">
-              {performance.map((row, index) => {
-                const groups = sourcesOf(document, `/performance/${index}`, row, SEASON_PARTS);
-                const statSource = (key: string) => sourceOf(document, `/performance/${index}/${key}`);
+              {performance.map((season, index) => {
+                const anchor = `/performance/${index}`;
+                const seasonIssues = issuesAt(anchor);
+                const groups = sourcesOf(document, anchor, season, SEASON_PARTS);
                 return (
-                  <li key={`${asText(row.season)}-${index}`} className="break-inside-avoid rounded-md border border-kumo-hairline bg-kumo-tint px-3 py-2.5">
+                  <li
+                    key={`${asText(season.season)}-${index}`}
+                    data-anchor={anchor}
+                    tabIndex={-1}
+                    className={`scroll-mt-4 break-inside-avoid rounded-md border px-3 py-2.5 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand ${problemTone(seasonIssues, "border-kumo-hairline bg-kumo-tint")}`}
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <span className="min-w-0 font-medium text-kumo-strong">
-                        {asText(row.season)}
-                        {asText(row.competition) ? <span className="font-normal text-kumo-subtle"> · {asText(row.competition)}</span> : null}
+                        {asText(season.season)}
+                        {asText(season.competition) ? <span className="font-normal text-kumo-subtle"> · {asText(season.competition)}</span> : null}
                       </span>
                       {groups[0] && groups[0].parts.length === 0 ? <Mark source={groups[0].source} /> : null}
                     </div>
                     <dl className="m-0 mt-2 grid grid-cols-5 gap-2 text-center">
-                      <Stat term="Apps" value={row.appearances} source={statSource("appearances")} />
-                      <Stat term="Mins" value={row.minutes} source={statSource("minutes")} />
-                      <Stat term="Goals" value={row.goals} source={statSource("goals")} />
-                      <Stat term="Assists" value={row.assists} source={statSource("assists")} />
-                      <Stat term="Clean sheets" short="CS" value={row.clean_sheets} source={statSource("clean_sheets")} />
+                      <Stat term="Apps" value={season.appearances} />
+                      <Stat term="Mins" value={season.minutes} />
+                      <Stat term="Goals" value={season.goals} />
+                      <Stat term="Assists" value={season.assists} />
+                      <Stat term="Clean sheets" short="CS" value={season.clean_sheets} />
                     </dl>
                     {groups.some((group) => group.parts.length > 0) ? (
                       <ul aria-label="Other sources" className="m-0 mt-2 flex list-none flex-wrap justify-end gap-x-3 gap-y-1.5 p-0">
@@ -247,44 +304,93 @@ export function SubmissionView({
                         ))}
                       </ul>
                     ) : null}
+                    <IssueNotes issues={seasonIssues} />
                   </li>
                 );
               })}
             </ul>
-            <p className="mt-1.5 mb-0 text-xs text-kumo-subtle">A dash means that the value is not stated. It does not mean zero.</p>
+            {performance.length > 0 ? <p className="mt-1.5 mb-0 text-xs text-kumo-subtle">A dash means that the value is not stated. It does not mean zero.</p> : null}
           </section>
         ) : null}
 
-        <SubmissionDetails submission={submission} consent={consent} />
-        <Extensions extensions={extensions} />
+        <SubmissionDetails submission={submission} consent={consent} issuesAt={issuesAt} />
+        <Extensions extensions={extensions} issuesAt={issuesAt} />
       </LayerCard.Primary>
     </LayerCard>
   );
 }
 
+/** Background and border for a season with problems: red for an error, amber for a warning only. */
+function problemTone(issues: Issue[], normal: string): string {
+  if (issues.some((issue) => issue.severity === "error")) return "border-kumo-danger bg-kumo-danger-tint";
+  if (issues.length > 0) return "border-kumo-warning bg-kumo-warning-tint";
+  return normal;
+}
+
+/**
+ * Background and a bar on the left for a row with problems. A row in a divided list has no border of its own,
+ * so a border colour colours only the divider below it, and that looks like a mistake.
+ */
+function rowTone(issues: Issue[]): string {
+  if (issues.some((issue) => issue.severity === "error")) return "-mx-2 rounded-md px-2 bg-kumo-danger-tint shadow-[inset_3px_0_0_var(--color-kumo-danger)]";
+  if (issues.length > 0) return "-mx-2 rounded-md px-2 bg-kumo-warning-tint shadow-[inset_3px_0_0_var(--color-kumo-warning)]";
+  return "";
+}
+
+/** The problems at one place in the card, in the words of the library. */
+function IssueNotes({ issues }: { issues: Issue[] }) {
+  if (issues.length === 0) return null;
+  return (
+    <ul className="m-0 mt-1.5 list-none space-y-1 p-0 text-sm" data-testid="issue-notes">
+      {issues.map((issue) => (
+        <li key={`${issue.code}${issue.path}`} className={`flex items-start gap-1.5 ${issue.severity === "error" ? "text-kumo-danger" : "text-kumo-warning"}`}>
+          {issue.severity === "error" ? (
+            <WarningCircleIcon aria-hidden="true" weight="fill" className="mt-1 shrink-0" />
+          ) : (
+            <WarningIcon aria-hidden="true" weight="fill" className="mt-1 shrink-0" />
+          )}
+          {issue.message}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+const NOT_IN_FILE = <span className="font-medium text-kumo-danger">Not in the file</span>;
+
 /** Facts about the file, not claims about the player. They have no source marks. */
-function SubmissionDetails({ submission, consent }: { submission: Doc; consent: Doc }) {
+function SubmissionDetails({ submission, consent, issuesAt }: { submission: Doc; consent: Doc; issuesAt: (anchor: string) => Issue[] }) {
   const lawfulBasis = label(VALUE_LABELS.lawful_basis, consent.lawful_basis);
   const consentDate = formatDate(consent.consent_date);
-  const rows: [string, string | undefined][] = [
-    ["Sent by", label(VALUE_LABELS.sender, submission.sender)],
-    ["Lawful basis", lawfulBasis && (consentDate ? `${lawfulBasis}, given on ${consentDate}` : lawfulBasis)],
-    ["Created", formatTimestamp(submission.submitted_at)],
-    ["Submission ID", asText(submission.submission_id)],
+  const rows: [term: string, anchor: string, value: string | undefined][] = [
+    ["Sent by", "/submission/sender", label(VALUE_LABELS.sender, submission.sender)],
+    ["Lawful basis", "/consent/lawful_basis", lawfulBasis && (consentDate ? `${lawfulBasis}, given on ${consentDate}` : lawfulBasis)],
+    ["Created", "/submission/submitted_at", formatTimestamp(submission.submitted_at)],
+    ["Submission ID", "/submission/submission_id", asText(submission.submission_id)],
   ];
-  if (!rows.some(([, value]) => value)) return null;
+  const shown = rows.filter(([, anchor, value]) => value || issuesAt(anchor).length > 0);
+  if (shown.length === 0) return null;
   return (
     <section aria-label="About this file" className="mt-4 border-t border-kumo-hairline pt-3">
       <h3 className="mb-1 text-sm font-semibold text-kumo-strong">About this file</h3>
-      <dl className="m-0 grid grid-cols-[minmax(5.5rem,7.5rem)_minmax(0,1fr)] gap-x-3 gap-y-1 text-sm">
-        {rows.map(([term, value]) =>
-          value ? (
-            <div key={term} className="contents">
+      <dl className="m-0 divide-y divide-kumo-hairline text-sm">
+        {shown.map(([term, anchor, value]) => {
+          const rowIssues = issuesAt(anchor);
+          return (
+            <div
+              key={term}
+              data-anchor={anchor}
+              tabIndex={-1}
+              className={`grid scroll-mt-4 grid-cols-[minmax(5.5rem,7.5rem)_minmax(0,1fr)] gap-x-3 py-1.5 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand ${rowTone(rowIssues)}`}
+            >
               <dt className="text-kumo-subtle">{term}</dt>
-              <dd className={`m-0 min-w-0 text-kumo-default ${term === "Submission ID" ? "font-mono text-xs leading-5 break-all" : ""}`}>{value}</dd>
+              <dd className="m-0 min-w-0 text-kumo-default">
+                <span className={term === "Submission ID" ? "font-mono text-xs leading-5 break-all" : ""}>{value ?? NOT_IN_FILE}</span>
+                <IssueNotes issues={rowIssues} />
+              </dd>
             </div>
-          ) : null,
-        )}
+          );
+        })}
       </dl>
     </section>
   );
@@ -293,39 +399,62 @@ function SubmissionDetails({ submission, consent }: { submission: Doc; consent: 
 /**
  * Extensions are not part of FPDS, and a consumer does not recognise them (§12).
  * They appear closed, grouped by prefix, as plain data with no source marks and no FPDS styling.
+ * A warning about an extension shows next to that extension, and the closed section says how many warnings it has.
  */
-function Extensions({ extensions }: { extensions: Doc }) {
+function Extensions({ extensions, issuesAt }: { extensions: Doc; issuesAt: (anchor: string) => Issue[] }) {
   const keys = Object.keys(extensions);
-  if (keys.length === 0) return null;
-  const groups = new Map<string, [string, unknown][]>();
+  const sectionIssues = issuesAt("/extensions");
+  if (keys.length === 0 && sectionIssues.length === 0) return null;
+  const groups = new Map<string, { key: string; name: string; value: unknown }[]>();
   for (const key of keys) {
     const slash = key.indexOf("/");
     const prefix = slash > 0 ? key.slice(0, slash) : key;
     const name = slash > 0 ? key.slice(slash + 1) : "";
-    groups.set(prefix, [...(groups.get(prefix) ?? []), [name, extensions[key]]]);
+    groups.set(prefix, [...(groups.get(prefix) ?? []), { key, name, value: extensions[key] }]);
   }
+  const problems = [...sectionIssues, ...keys.flatMap((key) => issuesAt(`/extensions/${escapeToken(key)}`))];
+  const warnings = problems.filter((issue) => issue.severity === "warning").length;
+  const errors = problems.length - warnings;
+  const counts = [errors > 0 && `${errors} ${errors === 1 ? "problem" : "problems"}`, warnings > 0 && `${warnings} ${warnings === 1 ? "warning" : "warnings"}`].filter(Boolean);
   return (
-    <details data-testid="extensions" className="group mt-4 border-t border-kumo-hairline pt-3 text-sm">
+    <details data-testid="extensions" data-anchor="/extensions" className="group mt-4 scroll-mt-4 border-t border-kumo-hairline pt-3 text-sm">
       <summary className="cursor-pointer font-semibold text-kumo-strong">
-        Extra information from other software <span className="font-normal text-kumo-subtle">({keys.length})</span>
+        Extra information from other software{" "}
+        <span className="whitespace-nowrap">
+          <span className="font-normal text-kumo-subtle">({keys.length})</span>
+          {counts.length > 0 ? (
+            <span className={`ml-2 font-medium ${errors > 0 ? "text-kumo-danger" : "text-kumo-warning"}`}>{counts.join(", ")}</span>
+          ) : null}
+        </span>
       </summary>
       <p className="mt-2 mb-3 text-kumo-subtle">
         FPDS does not define these fields. Other software added them. They show here as the file contains them.
       </p>
+      <IssueNotes issues={sectionIssues} />
       {[...groups].map(([prefix, fields]) => (
         <section key={prefix} aria-label={prefix} className="mb-3 last:mb-0">
           <h4 className="m-0 mb-1 font-mono text-xs text-kumo-subtle">{prefix}</h4>
           <dl className="m-0 space-y-1">
-            {fields.map(([name, value]) => (
-              <div key={name} className="grid grid-cols-[minmax(5.5rem,7.5rem)_minmax(0,1fr)] gap-x-3">
-                <dt className="font-mono text-xs leading-6 break-all text-kumo-subtle">{name || "(no field name)"}</dt>
-                <dd className="m-0 min-w-0">
-                  {asText(value) ?? (
-                    <pre className="m-0 overflow-x-auto font-mono text-xs leading-5 whitespace-pre-wrap break-all">{JSON.stringify(value, null, 2)}</pre>
-                  )}
-                </dd>
-              </div>
-            ))}
+            {fields.map(({ key, name, value }) => {
+              const anchor = `/extensions/${escapeToken(key)}`;
+              const fieldIssues = issuesAt(anchor);
+              return (
+                <div
+                  key={key}
+                  data-anchor={anchor}
+                  tabIndex={-1}
+                  className={`grid scroll-mt-4 grid-cols-[minmax(5.5rem,7.5rem)_minmax(0,1fr)] gap-x-3 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand ${fieldIssues.length > 0 ? `py-1 ${rowTone(fieldIssues)}` : ""}`}
+                >
+                  <dt className="font-mono text-xs leading-6 break-all text-kumo-subtle">{name || "(no field name)"}</dt>
+                  <dd className="m-0 min-w-0">
+                    {asText(value) ?? (
+                      <pre className="m-0 overflow-x-auto font-mono text-xs leading-5 whitespace-pre-wrap break-all">{JSON.stringify(value, null, 2)}</pre>
+                    )}
+                    <IssueNotes issues={fieldIssues} />
+                  </dd>
+                </div>
+              );
+            })}
           </dl>
         </section>
       ))}
@@ -333,19 +462,37 @@ function Extensions({ extensions }: { extensions: Doc }) {
   );
 }
 
-function Row({ term, value, source }: { term: string; value: ReactNode; source?: Source | SourceGroup[] | undefined }) {
-  if (value === undefined || value === "" || value === null) return null;
-  const groups = source === undefined ? [] : Array.isArray(source) ? source : [{ source, parts: [] }];
-  const checked = groups.length > 0 && groups.every((group) => group.source.checked);
+function Row({
+  term,
+  anchor,
+  value,
+  source,
+  issues,
+}: {
+  term: string;
+  anchor: string;
+  value: ReactNode;
+  source?: Source | SourceGroup[] | undefined;
+  issues: Issue[];
+}) {
+  const missing = value === undefined || value === "" || value === null;
+  if (missing && issues.length === 0) return null;
+  const groups = missing || source === undefined ? [] : Array.isArray(source) ? source : [{ source, parts: [] }];
   // In a wide card, three columns: term, value, source. The source badges line up in one column.
   // In a narrow card, the term and the source share the first line, and the value has the full width below them.
+  // The badge shows the source. The value itself has one style, so that every value is equally easy to read.
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 py-2 @md:grid-cols-[minmax(5.5rem,7.5rem)_minmax(0,1fr)_auto] @md:items-baseline">
+    <div
+      data-anchor={anchor}
+      tabIndex={-1}
+      className={`grid scroll-mt-4 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 py-2 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand @md:grid-cols-[minmax(5.5rem,7.5rem)_minmax(0,1fr)_auto] @md:items-baseline ${
+        rowTone(issues)
+      }`}
+    >
       <dt className="col-start-1 row-start-1 text-sm text-kumo-subtle">{term}</dt>
-      <dd
-        className={`col-span-2 col-start-1 row-start-2 m-0 min-w-0 break-words @md:col-span-1 @md:col-start-2 @md:row-start-1 ${groups.length > 0 && !checked ? "italic" : "text-kumo-strong"}`}
-      >
-        {value}
+      <dd className="col-span-2 col-start-1 row-start-2 m-0 min-w-0 break-words text-kumo-strong @md:col-span-1 @md:col-start-2 @md:row-start-1">
+        {missing ? NOT_IN_FILE : value}
+        <IssueNotes issues={issues} />
       </dd>
       <dd className="col-start-2 row-start-1 m-0 flex flex-col items-end gap-1 justify-self-end @md:col-start-3">
         {groups.map((group) => (
@@ -359,15 +506,13 @@ function Row({ term, value, source }: { term: string; value: ReactNode; source?:
   );
 }
 
-function Stat({ term, short, value, source }: { term: string; short?: string; value: unknown; source: Source }) {
+function Stat({ term, short, value }: { term: string; short?: string; value: unknown }) {
   return (
     <div>
       <dt className="text-[11px] tracking-wide text-kumo-subtle uppercase">
         {short ? <abbr title={term} className="no-underline">{short}</abbr> : term}
       </dt>
-      <dd className={`m-0 font-medium tabular-nums ${source.checked ? "text-kumo-strong" : "italic"}`}>
-        {typeof value === "number" ? value.toLocaleString("en-GB") : "–"}
-      </dd>
+      <dd className="m-0 font-medium text-kumo-strong tabular-nums">{typeof value === "number" ? value.toLocaleString("en-GB") : "–"}</dd>
     </div>
   );
 }

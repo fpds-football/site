@@ -25,6 +25,8 @@ This repository is the website at `https://fpds.football`. The specification is 
 - Show every problem from `validate`. Do not write FPDS messages or rules in the site. The minor status and the age come from `calculated`.
 - Never show a badge or text that says that FPDS verified the information. Each rendered submission keeps the note about structure.
 - Extensions are not part of FPDS. Keep them in the closed section, without source marks.
+- A problem shows in the banner and at its place in the card. When a new row is added to `SubmissionView`, add its pointer to `ROW_POINTERS`.
+- The minor badge is purple. Do not use purple for anything else in the card.
 - A draft file, an unsupported version and a file that is not FPDS show no fields.
 - Test each new behaviour in `tests/viewer.spec.ts` with a fixture in `tests/fixtures/`.
 

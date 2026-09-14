@@ -33,6 +33,8 @@ This repository does not serve the schema. `fpds-football/spec` serves `https://
 - `src/viewer/openFile.ts` sorts a file into one of four results: a document, a draft, an unsupported version, or a refusal (not JSON, or not FPDS). It uses `readOpenedFile` from the builder and `validate` from `@fpds-football/fpds`.
 - `src/viewer/Viewer.tsx` shows the result (DECISIONS.md D-37 in the spec repository):
   - A document with errors shows under a red "Not a valid FPDS submission" banner, with the messages from the library. Warnings show in a separate banner and do not make the file invalid.
+  - Each problem also shows at its place in the card. A missing value shows as "Not in the file". `anchorFor` in `SubmissionView` gives the place, and each problem in a banner is a link to it.
+  - "Open an example" shows a copy of an example from the spec repository. The example is part of the page script, so it sends no request.
   - If `is_minor` does not agree with the date of birth, the card shows the value in the file and the calculated value, with the age from `calculated.age`. The minor badge shows if the file or the date of birth says that the player is a minor.
   - Extensions show in a closed section, grouped by prefix, without source marks.
   - A draft file, an unsupported version and a file that is not FPDS show no fields.
