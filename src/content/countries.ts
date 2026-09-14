@@ -1,6 +1,8 @@
 /**
- * ISO 3166-1 alpha-3 country codes with English names, as SPEC.md §3 requires.
- * Generated once from i18n-iso-countries 7.14.0. Regenerate it only when ISO 3166-1 changes.
+ * Country codes that FPDS permits, with English names (SPEC.md §3.1, DECISIONS.md D-42):
+ * ISO 3166-1 alpha-3, plus ENG, SCO, WAL and NIR for the football nations of the United Kingdom, and XKX for Kosovo.
+ * tests/countries.spec.ts makes sure that this list agrees with the schema in @fpds-football/fpds.
+ * The English names of the ISO codes come from i18n-iso-countries 7.14.0.
  */
 export interface Country {
   code: string;
@@ -9,7 +11,6 @@ export interface Country {
 
 export const COUNTRIES: Country[] = [
   { code: "AFG", name: "Afghanistan" },
-  { code: "ALA", name: "Åland Islands" },
   { code: "ALB", name: "Albania" },
   { code: "DZA", name: "Algeria" },
   { code: "ASM", name: "American Samoa" },
@@ -73,6 +74,7 @@ export const COUNTRIES: Country[] = [
   { code: "ECU", name: "Ecuador" },
   { code: "EGY", name: "Egypt" },
   { code: "SLV", name: "El Salvador" },
+  { code: "ENG", name: "England" },
   { code: "GNQ", name: "Equatorial Guinea" },
   { code: "ERI", name: "Eritrea" },
   { code: "EST", name: "Estonia" },
@@ -123,7 +125,7 @@ export const COUNTRIES: Country[] = [
   { code: "KAZ", name: "Kazakhstan" },
   { code: "KEN", name: "Kenya" },
   { code: "KIR", name: "Kiribati" },
-  { code: "XKK", name: "Kosovo" },
+  { code: "XKX", name: "Kosovo" },
   { code: "KWT", name: "Kuwait" },
   { code: "KGZ", name: "Kyrgyzstan" },
   { code: "LAO", name: "Lao People's Democratic Republic" },
@@ -169,6 +171,7 @@ export const COUNTRIES: Country[] = [
   { code: "NIU", name: "Niue" },
   { code: "NFK", name: "Norfolk Island" },
   { code: "PRK", name: "North Korea" },
+  { code: "NIR", name: "Northern Ireland" },
   { code: "MNP", name: "Northern Mariana Islands" },
   { code: "NOR", name: "Norway" },
   { code: "OMN", name: "Oman" },
@@ -202,6 +205,7 @@ export const COUNTRIES: Country[] = [
   { code: "SMR", name: "San Marino" },
   { code: "STP", name: "Sao Tome and Principe" },
   { code: "SAU", name: "Saudi Arabia" },
+  { code: "SCO", name: "Scotland" },
   { code: "SEN", name: "Senegal" },
   { code: "SRB", name: "Serbia" },
   { code: "SYC", name: "Seychelles" },
@@ -235,10 +239,10 @@ export const COUNTRIES: Country[] = [
   { code: "TON", name: "Tonga" },
   { code: "TTO", name: "Trinidad and Tobago" },
   { code: "TUN", name: "Tunisia" },
-  { code: "TUR", name: "Türkiye" },
   { code: "TKM", name: "Turkmenistan" },
   { code: "TCA", name: "Turks and Caicos Islands" },
   { code: "TUV", name: "Tuvalu" },
+  { code: "TUR", name: "Türkiye" },
   { code: "UGA", name: "Uganda" },
   { code: "UKR", name: "Ukraine" },
   { code: "ARE", name: "United Arab Emirates" },
@@ -253,11 +257,13 @@ export const COUNTRIES: Country[] = [
   { code: "VNM", name: "Vietnam" },
   { code: "VGB", name: "Virgin Islands, British" },
   { code: "VIR", name: "Virgin Islands, U.S." },
+  { code: "WAL", name: "Wales" },
   { code: "WLF", name: "Wallis and Futuna" },
   { code: "ESH", name: "Western Sahara" },
   { code: "YEM", name: "Yemen" },
   { code: "ZMB", name: "Zambia" },
   { code: "ZWE", name: "Zimbabwe" },
+  { code: "ALA", name: "Åland Islands" },
 ];
 
 const NAMES = new Map(COUNTRIES.map((country) => [country.code, country.name]));

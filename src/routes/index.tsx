@@ -25,12 +25,58 @@ function Home() {
           A player submission should say who claimed what.
         </h1>
 
+        <p className="prose-block mb-4 text-[1.15rem] leading-relaxed">
+          FPDS is a free, open standard for player submissions. A player submission is the information that an agent,
+          an intermediary or a player sends to a club about a player.
+        </p>
         <p className="prose-block mb-10 text-[1.05rem]">
-          Agents, players and clubs send player information as free text, with no structure and no sources. FPDS is an
-          open JSON format for that information. The core is small. Every figure has its denominator, and every claim
-          has its source.
+          FPDS gives every submission the same structure. Every figure has its context, and every claim shows who made
+          it. A club can then read a submission in seconds, compare it with others, and see what it can check.
         </p>
 
+        <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <section aria-labelledby="problem" className="border-t-2 border-ink pt-4">
+            <h2 id="problem" className="mb-3 text-[1.1rem] font-semibold">The problem</h2>
+            <p className="mb-3">Today, most submissions are free text in an email or a message:</p>
+            <blockquote className="mb-3 border-l-2 border-rule pl-4 text-ink-soft italic">
+              “Good lad, played in X league, 10 goals, plays centre mid, available now.”
+            </blockquote>
+            <p className="mb-2">A club cannot use this message without more questions:</p>
+            <ul className="mb-0 list-disc pl-5">
+              <li>Ten goals in how many minutes?</li>
+              <li>Centre mid as a 6, an 8 or a 10?</li>
+              <li>Is the player under contract, and until when?</li>
+              <li>Does the sender have a mandate to offer the player?</li>
+              <li>Who says so?</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="goal" className="border-t-2 border-verified pt-4">
+            <h2 id="goal" className="mb-3 text-[1.1rem] font-semibold">The goal</h2>
+            <ul className="mb-0 list-none space-y-3 pl-0">
+              <li>
+                <strong className="block">Clubs get information that they can use.</strong>
+                The same fields in the same format from every sender, with minutes for every output and a source for
+                every claim.
+              </li>
+              <li>
+                <strong className="block">Agents and players get taken seriously.</strong>
+                A clear, complete submission gets read. A submission that shows its sources gets trust.
+              </li>
+              <li>
+                <strong className="block">Software can read and write it.</strong>
+                Agency tools, scouting platforms and club systems can all use the same open format, without a licence
+                fee.
+              </li>
+              <li>
+                <strong className="block">Player data is shared with care.</strong>
+                FPDS contains no medical records, and it marks every submission about a minor.
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <h2 className="section-heading">What a club sees</h2>
         <section
           aria-label="Example submission showing verified and agent-stated claims"
           className="mb-3.5 border border-rule bg-field px-6 pt-6 pb-5"
@@ -55,6 +101,24 @@ function Home() {
           If an interface shows a verified figure and an unverified figure in the same way, the format has no purpose.
         </p>
 
+        <section aria-labelledby="how" className="prose-block mb-12">
+          <h2 id="how" className="section-heading">How it works</h2>
+          <ol className="mb-0 list-none space-y-4 pl-0">
+            <HowStep number={1} title="Create the submission">
+              Use the free <Link to="/build/">builder</Link> on this site, or software that supports FPDS. The builder
+              runs in your browser, and your information stays on your device.
+            </HowStep>
+            <HowStep number={2} title="Send the file">
+              The builder makes a file that ends with <code>.fpds.json</code>. Send it by email or message, as you send a
+              PDF now.
+            </HowStep>
+            <HowStep number={3} title="The club reads it">
+              The club opens the file in software that supports FPDS. A free viewer on this site is coming soon. It shows
+              the player, the source of each value, and any problems with the file.
+            </HowStep>
+          </ol>
+        </section>
+
         <nav aria-label="Main links" className="mb-12 grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] border-t border-rule">
           <Door href={SPEC_URL} title="Read the specification" note="The normative document, in fourteen sections" />
           <Door href="/schema/v0.1/player.json" title="Get the schema" note="JSON Schema 2020-12, at a permanent URL" />
@@ -76,6 +140,13 @@ function Home() {
             ))}
           </ul>
 
+          <h2 className="section-heading">An open standard</h2>
+          <p>
+            FPDS is free to use. The specification and the schema have open licences, and nobody needs permission to
+            build software for it. FPDS starts small, and new fields enter it only after a public consultation with
+            agents, clubs and players.
+          </p>
+
           <h2 className="section-heading">What FPDS is not</h2>
           <ul>
             <li>
@@ -92,7 +163,13 @@ function Home() {
             </li>
           </ul>
 
-          <h2 className="section-heading">Validate a submission</h2>
+          <h2 className="section-heading">For software providers</h2>
+          <p>
+            The schema is at a permanent URL. The <a href="https://www.npmjs.com/package/@fpds-football/fpds">TypeScript
+            library</a> validates documents and gives messages in plain English. The{" "}
+            <a href="https://github.com/fpds-football/spec/tree/main/tests/conformance">conformance suite</a> tests any
+            implementation.
+          </p>
           <pre className="mb-4 overflow-x-auto border border-rule bg-field px-4 py-3.5 leading-normal">
             <code>{`pip install check-jsonschema
 check-jsonschema \\
@@ -103,6 +180,20 @@ check-jsonschema \\
         </div>
       </main>
     </>
+  );
+}
+
+function HowStep({ number, title, children }: { number: number; title: string; children: ReactNode }) {
+  return (
+    <li className="grid grid-cols-[2.25rem_1fr] gap-3">
+      <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center border border-verified font-semibold text-verified">
+        {number}
+      </span>
+      <div>
+        <strong className="block">{title}</strong>
+        {children}
+      </div>
+    </li>
   );
 }
 
