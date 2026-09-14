@@ -10,6 +10,14 @@ This repository is the website at `https://fpds.football`. The specification is 
 - **Do not put rules about FPDS documents in this repository.** Use `getFieldStates`, `validate` and `prepareDocument` from `@fpds-football/fpds`.
 - **The specification is the authority.** If the site and `SPEC.md` disagree, tell the user.
 
+## Builder
+
+- The draft is a plain object that changes by JSON Pointer (`src/builder/draft.ts`). Do not add a form library that uses a different kind of path.
+- Do not change a value that the user chose without their action. Show a conflict with a fix button.
+- A value in a field that does not apply stays in the draft, but the export does not include it.
+- Storage is session storage only. Do not use local storage or IndexedDB for player data.
+- Test each new behaviour in `tests/builder.spec.ts`, and validate exported files with `@fpds-football/fpds`.
+
 ## Content
 
 - All text is Simple English (ASD-STE100, pragmatic mode), with British spelling. Use the `simple-english` skill. The homepage headline keeps its voice.

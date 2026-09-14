@@ -58,6 +58,7 @@ function Home() {
         <nav aria-label="Main links" className="mb-12 grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] border-t border-rule">
           <Door href={SPEC_URL} title="Read the specification" note="The normative document, in fourteen sections" />
           <Door href="/schema/v0.1/player.json" title="Get the schema" note="JSON Schema 2020-12, at a permanent URL" />
+          <Door to="/build/" title="Create a submission" note="In your browser. Your data stays on your device." />
           <Door to="/consult/" title="Take part" note="Help decide what goes into FPDS" />
         </nav>
 
@@ -118,7 +119,7 @@ function Claim({ label, value, mark, kind }: { label: string; value: string; mar
   );
 }
 
-function Door({ title, note, href, to }: { title: string; note: string; href?: string; to?: "/consult/" }) {
+function Door({ title, note, href, to }: { title: string; note: string; href?: string; to?: "/consult/" | "/build/" }) {
   const content: ReactNode = (
     <>
       <span className="font-semibold text-verified underline decoration-1 underline-offset-2">{title}</span>

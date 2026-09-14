@@ -12,6 +12,7 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@fpds-football/fpds": "0.1.0-alpha.0",
     "@tanstack/react-router": "^1.170.36",
     "@tanstack/react-start": "^1.168.54",
     "react": "^19.3.0",

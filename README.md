@@ -6,7 +6,8 @@ The website of the [Football Player Data Standard (FPDS)](https://github.com/fpd
 
 - **Homepage.** Explains FPDS and links to the specification, the schema and the consultations.
 - **Consultations.** One page for each open consultation. Agents, clubs and players answer in a Tally form. `src/content/consultations.ts` contains each consultation as data.
-- **Builder and viewer.** Not built yet. They will run only in the browser. Player data will never go to a server.
+- **Builder** at `/build/`. A person fills in a form and exports a file that ends with `.fpds.json`. The builder runs only in the browser. Player data never goes to a server.
+- **Viewer.** Not built yet.
 
 This repository does not serve the schema. `fpds-football/spec` serves `https://fpds.football/schema/*`, so the permanent schema URL does not depend on this site.
 
@@ -16,6 +17,16 @@ This repository does not serve the schema. `fpds-football/spec` serves `https://
 - Tailwind CSS.
 - Cloudflare Workers.
 - Playwright tests against the production build in the local Cloudflare runtime.
+
+## How the builder works
+
+- `src/builder/draft.ts` keeps the draft as a plain object, and changes it by JSON Pointer. The field states, issues and provenance from `@fpds-football/fpds` use JSON Pointers too.
+- `src/builder/useBuilder.ts` gets the state of each field, the conflicts and the export result from `@fpds-football/fpds`. The builder contains no FPDS rules of its own.
+- `src/builder/export.ts` removes empty values and values that do not apply, removes provenance for missing values, and calls `prepareDocument`. Each export makes a new submission ID.
+- `src/builder/storage.ts` saves work in session storage, which the browser deletes when the tab closes. It also reads and writes draft files that end with `.fpds-draft.json`.
+- `src/components/SubmissionView.tsx` shows a submission as a club sees it, with the source of each value. The viewer will use it too.
+
+`tests/builder.spec.ts` exports real files and validates them with `@fpds-football/fpds`. It also makes sure that the builder sends no request except for static files from this site.
 
 ## Security headers
 
