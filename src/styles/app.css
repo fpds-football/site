@@ -26,6 +26,23 @@ textarea {
   font-size: max(16px, 1rem);
 }
 
+/*
+ * Print and Save as PDF, for the viewer (DECISIONS.md D-35). Elements with print:hidden leave the page.
+ * Browsers remove background colours in print by default. Source badges need their colours, so keep them.
+ */
+@media print {
+  @page {
+    margin: 16mm 14mm;
+  }
+
+  html,
+  body {
+    @apply bg-kumo-base;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
 @layer components {
   .wrap {
     @apply mx-auto max-w-[60rem] px-6;

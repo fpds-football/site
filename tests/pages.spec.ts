@@ -8,6 +8,7 @@ const PAGES = [
   { path: "/consult/wages/", heading: "Does a player submission include information about wages?" },
   { path: "/consult/privacy/", heading: "Privacy notice for consultations" },
   { path: "/build/", heading: "Create a submission" },
+  { path: "/view/", heading: "View a submission" },
 ];
 
 function collectProblems(page: Page): string[] {

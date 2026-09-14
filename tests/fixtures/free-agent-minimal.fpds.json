@@ -1,0 +1,31 @@
+{
+  "fpds_version": "0.1.0",
+  "submission": {
+    "submission_id": "3f0a1c88-1d55-4a02-9f7b-6e2c0d11a903",
+    "submitted_at": "2026-09-14T11:02:00Z",
+    "purposes": [
+      "permanent_transfer",
+      "trial"
+    ],
+    "sender": "player"
+  },
+  "player": {
+    "full_name": "Daniel Okoye",
+    "date_of_birth": "1997-11-02",
+    "nationalities": [
+      "NGA",
+      "GBR"
+    ]
+  },
+  "positions": {
+    "primary_position": "CB"
+  },
+  "contract": {
+    "status": "free_agent"
+  },
+  "consent": {
+    "lawful_basis": "consent",
+    "consent_date": "2026-09-14",
+    "is_minor": false
+  }
+}

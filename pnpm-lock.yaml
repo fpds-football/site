@@ -12,8 +12,8 @@ importers:
         specifier: 2.13.2
         version: 2.13.2(@date-fns/tz@1.5.0)(@phosphor-icons/react@2.1.10(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(zod@4.6.4)
       '@fpds-football/fpds':
-        specifier: 0.1.0-alpha.2
-        version: 0.1.0-alpha.2
+        specifier: 0.1.0-alpha.3
+        version: 0.1.0-alpha.3
       '@phosphor-icons/react':
         specifier: 2.1.10
         version: 2.1.10(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -410,8 +410,8 @@ packages:
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
 
-  '@fpds-football/fpds@0.1.0-alpha.2':
-    resolution: {integrity: sha512-XzM5pmoZx3vkWwZgK1Ygu0FGnSgfSh4N/NN1xda0eokOjeXD+l/iapn6WlUGRp9vp1NwnNwRn8Dmkgt6937Ybg==}
+  '@fpds-football/fpds@0.1.0-alpha.3':
+    resolution: {integrity: sha512-qngo3FWFQlX4CdzTl/hnjDGnsjlSfCnRDNTMJxNAqgH24I4TyTknIyL7kavAMluvY6ml8BLtDh54OYzJUMTlBQ==}
     engines: {node: '>=20'}
 
   '@img/colour@1.1.0':
@@ -2115,7 +2115,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@fpds-football/fpds@0.1.0-alpha.2':
+  '@fpds-football/fpds@0.1.0-alpha.3':
     dependencies:
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)

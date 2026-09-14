@@ -1,0 +1,89 @@
+{
+  "fpds_version": "0.2.0",
+  "submission": {
+    "submission_id": "b7f3c2e1-4a9d-4f11-9c3e-2a1d5f8b0c44",
+    "submitted_at": "2026-09-13T09:41:00Z",
+    "purposes": [
+      "permanent_transfer",
+      "loan"
+    ],
+    "sender": "intermediary"
+  },
+  "player": {
+    "full_name": "Tomasz Andrzej Wojcik",
+    "date_of_birth": "2003-04-17",
+    "nationalities": [
+      "POL",
+      "DEU"
+    ],
+    "current_club": {
+      "name": "Widzew Lodz",
+      "country": "POL"
+    },
+    "external_ids": {
+      "fifa_connect_id": "1702934415"
+    }
+  },
+  "positions": {
+    "primary_position": "CM",
+    "secondary_positions": [
+      "CDM",
+      "CAM"
+    ]
+  },
+  "contract": {
+    "status": "under_contract",
+    "expiry_date": "2027-06-30"
+  },
+  "representation": {
+    "agent_name": "Marek Zielinski",
+    "fifa_agent_licence": "POL-2024-01188",
+    "mandate_status": "exclusive"
+  },
+  "performance": [
+    {
+      "season": "2025/26",
+      "competition": "Ekstraklasa",
+      "competition_country": "POL",
+      "appearances": 31,
+      "minutes": 2418,
+      "goals": 10,
+      "assists": 6
+    },
+    {
+      "season": "2024/25",
+      "competition": "Ekstraklasa",
+      "competition_country": "POL",
+      "appearances": 24,
+      "minutes": 1362,
+      "goals": 3,
+      "assists": 4
+    }
+  ],
+  "consent": {
+    "lawful_basis": "consent",
+    "consent_date": "2026-07-02",
+    "is_minor": false
+  },
+  "provenance": {
+    "/performance/0/minutes": {
+      "source": "third_party_data",
+      "asserted_by": "Wyscout",
+      "asserted_at": "2026-09-01T00:00:00Z"
+    },
+    "/performance/0/goals": {
+      "source": "third_party_data",
+      "asserted_by": "Wyscout",
+      "asserted_at": "2026-09-01T00:00:00Z"
+    },
+    "/contract/expiry_date": {
+      "source": "verified",
+      "asserted_by": "Widzew Lodz",
+      "asserted_at": "2026-08-14T00:00:00Z",
+      "verified_against": "FIFA TMS"
+    }
+  },
+  "extensions": {
+    "com.example/scouting_grade": "B+"
+  }
+}

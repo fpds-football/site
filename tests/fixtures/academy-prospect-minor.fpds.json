@@ -1,0 +1,48 @@
+{
+  "fpds_version": "0.1.0",
+  "submission": {
+    "submission_id": "e51d0a3b-6c22-41f8-8d90-14b7c2e6f087",
+    "submitted_at": "2026-09-14T16:40:00Z",
+    "purposes": [
+      "information_only"
+    ],
+    "sender": "intermediary"
+  },
+  "player": {
+    "full_name": "Liam Grealy",
+    "date_of_birth": "2010-03-08",
+    "nationalities": [
+      "IRL"
+    ],
+    "current_club": {
+      "name": "St Kevin's Boys",
+      "country": "IRL"
+    }
+  },
+  "positions": {
+    "primary_position": "RW",
+    "secondary_positions": [
+      "ST"
+    ]
+  },
+  "contract": {
+    "status": "amateur"
+  },
+  "representation": {
+    "agent_name": "Aoife Brennan",
+    "fifa_agent_licence": "IRL-2025-00417",
+    "mandate_status": "exclusive"
+  },
+  "consent": {
+    "lawful_basis": "consent",
+    "consent_date": "2026-09-01",
+    "is_minor": true
+  },
+  "provenance": {
+    "/player/date_of_birth": {
+      "source": "club_stated",
+      "asserted_by": "St Kevin's Boys",
+      "asserted_at": "2026-09-01T00:00:00Z"
+    }
+  }
+}

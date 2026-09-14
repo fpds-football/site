@@ -1,0 +1,59 @@
+{
+  "fpds_version": "0.1.0",
+  "submission": {
+    "submission_id": "9c41b7de-2f10-4c6d-b0a1-77e3f9a4d215",
+    "submitted_at": "2026-09-14T08:15:00Z",
+    "purposes": [
+      "loan"
+    ],
+    "sender": "intermediary"
+  },
+  "player": {
+    "full_name": "Mateo Silva Ferreira",
+    "date_of_birth": "2004-01-29",
+    "nationalities": [
+      "PRT"
+    ],
+    "current_club": {
+      "name": "Estoril Praia",
+      "country": "PRT"
+    }
+  },
+  "positions": {
+    "primary_position": "GK"
+  },
+  "contract": {
+    "status": "on_loan",
+    "expiry_date": "2027-06-30",
+    "parent_club": {
+      "name": "Sporting CP",
+      "country": "PRT"
+    }
+  },
+  "representation": {
+    "agent_name": "Joao Cardoso",
+    "mandate_status": "club_mandate"
+  },
+  "performance": [
+    {
+      "season": "2025/26",
+      "competition": "Liga Portugal 2",
+      "competition_country": "PRT",
+      "appearances": 18,
+      "minutes": 1620,
+      "clean_sheets": 6
+    },
+    {
+      "season": "2024",
+      "competition": "OBOS-ligaen",
+      "competition_country": "NOR",
+      "appearances": 12,
+      "minutes": 1080,
+      "clean_sheets": 4
+    }
+  ],
+  "consent": {
+    "lawful_basis": "legitimate_interest",
+    "is_minor": false
+  }
+}
