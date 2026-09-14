@@ -184,3 +184,24 @@ test("opening an FPDS document and exporting it gives a new version", async ({ p
   expect(document.player).toEqual(original.player);
   expect(document.provenance).toEqual(original.provenance);
 });
+
+test("every form control has text of 16px or more, so iOS Safari does not zoom on focus", async ({ page }) => {
+  // Make the conditional controls visible: source selectors, a season record and the agent fields.
+  await page.getByLabel("Who sends this submission?").selectOption({ label: "An intermediary, for example an agent" });
+  await section(page, "Player");
+  await page.getByLabel("Full name").fill("Daniel Okoye");
+  await page.getByLabel("Source").first().selectOption("verified");
+  await section(page, "Performance");
+  await page.getByRole("button", { name: "Add a season" }).click();
+
+  for (const name of ["Submission", "Player", "Positions", "Contract", "Representation", "Performance", "Consent"]) {
+    await section(page, name);
+    const small = await page.evaluate(() =>
+      [...document.querySelectorAll("input:not([type=checkbox]):not([type=file]), select, textarea")]
+        .filter((element) => (element as HTMLElement).offsetParent !== null)
+        .map((element) => ({ label: element.getAttribute("aria-label") ?? element.id, size: Number.parseFloat(getComputedStyle(element).fontSize) }))
+        .filter((control) => control.size < 16),
+    );
+    expect(small, name).toEqual([]);
+  }
+});

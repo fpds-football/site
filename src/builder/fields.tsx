@@ -5,7 +5,7 @@ import { escapeToken } from "./draft";
 import type { Builder } from "./useBuilder";
 
 const inputClass =
-  "w-full rounded-none border border-rule bg-field px-3 py-2 text-[0.95rem] text-ink focus:outline-2 focus:outline-offset-1 focus:outline-verified aria-[invalid=true]:border-[#b3261e]";
+  "w-full rounded-none border border-rule bg-field px-3 py-2 text-base text-ink focus:outline-2 focus:outline-offset-1 focus:outline-verified aria-[invalid=true]:border-[#b3261e]";
 
 interface FieldProps {
   builder: Builder;
@@ -360,7 +360,7 @@ export function SourcePicker({ builder, pointer }: { builder: Builder; pointer: 
       </label>
       <select
         id={id}
-        className="border border-rule bg-field px-1.5 py-0.5 text-[0.82rem] text-ink"
+        className="border border-rule bg-field px-1.5 py-0.5 text-base text-ink"
         value={entry?.source ?? ""}
         onChange={(event) =>
           builder.set(base, event.target.value ? { ...entry, source: event.target.value } : undefined)
@@ -378,7 +378,7 @@ export function SourcePicker({ builder, pointer }: { builder: Builder; pointer: 
           <input
             aria-label="Who made the claim"
             placeholder="Who, for example Wyscout"
-            className="border border-rule bg-field px-2 py-1 text-[0.82rem] text-ink"
+            className="border border-rule bg-field px-2 py-1 text-base text-ink"
             value={entry.asserted_by ?? ""}
             onChange={(event) => builder.set(`${base}/asserted_by`, event.target.value || undefined)}
           />
@@ -387,7 +387,7 @@ export function SourcePicker({ builder, pointer }: { builder: Builder; pointer: 
               aria-label="Verified against"
               placeholder="Checked against, for example FIFA TMS"
               aria-invalid={!entry.verified_against}
-              className="border border-rule bg-field px-2 py-1 text-[0.82rem] text-ink aria-[invalid=true]:border-[#b3261e]"
+              className="border border-rule bg-field px-2 py-1 text-base text-ink aria-[invalid=true]:border-[#b3261e]"
               value={entry.verified_against ?? ""}
               onChange={(event) => builder.set(`${base}/verified_against`, event.target.value || undefined)}
             />

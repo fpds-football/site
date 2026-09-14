@@ -32,6 +32,16 @@
     @apply rounded-[1px] outline-2 outline-offset-3 outline-verified;
   }
 
+  /*
+   * iOS Safari zooms into a form control when its text is less than 16px. Keep every control at 16px or more.
+   * Do not use maximum-scale in the viewport tag to stop the zoom. It also stops pinch zoom, which people need.
+   */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1rem);
+  }
+
   code {
     @apply font-mono text-[0.86em];
   }
