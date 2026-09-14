@@ -19,4 +19,4 @@ minimumReleaseAgeExclude:
   - '@tanstack/start-storage-context@1.167.32'
   - miniflare@5.20260911.1-alpha
   - wrangler@4.131.2
-  - '@fpds-football/fpds@0.1.0-alpha.0'
+  - '@fpds-football/*'
