@@ -41,6 +41,11 @@ for (const { path, heading } of PAGES) {
   });
 }
 
+test("the homepage link preview describes the standard", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", /free, open standard for player submissions/);
+});
+
 test("each page has link preview tags and a canonical URL", async ({ page }) => {
   for (const { path } of PAGES) {
     await page.goto(path);

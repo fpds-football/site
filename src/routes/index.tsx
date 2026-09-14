@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
     pageHead({
       title: "FPDS: Football Player Data Standard",
       description:
-        "An open format for player information that agents, players and clubs send to each other. Every claim has its source. Draft v0.1.0.",
+        "A free, open standard for player submissions from agents and players to clubs. Every figure has its context, and every claim shows who made it.",
       path: "/",
     }),
   component: Home,
