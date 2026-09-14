@@ -1,6 +1,6 @@
-import { LayerCard, Link } from "@cloudflare/kumo";
-import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
+import { Link } from "@cloudflare/kumo";
 import { createFileRoute } from "@tanstack/react-router";
+import { LinkCard } from "~/components/LinkCard";
 import { SiteHeader } from "~/components/SiteHeader";
 import { consultations } from "~/content/consultations";
 import { DECISIONS_URL, pageHead, SPEC_URL } from "~/content/site";
@@ -33,19 +33,11 @@ function ConsultIndex() {
             do not need technical knowledge.
           </p>
 
-          <h2 className="section-heading">Open at launch</h2>
-          <ul className="!list-none space-y-3 !pl-0">
+          <h2 className="section-heading">Open now</h2>
+          <ul className="!mb-4 flex !list-none flex-col gap-3 !pl-0">
             {consultations.map((c) => (
               <li key={c.slug} className="!m-0">
-                <Link href={`/consult/${c.slug}/`} variant="plain" className="block no-underline">
-                  <LayerCard className="group p-4 transition-colors hover:bg-kumo-tint">
-                    <span className="flex items-center justify-between gap-2 font-semibold text-kumo-link">
-                      {c.title}
-                      <ArrowRightIcon aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" />
-                    </span>
-                    <span className="mt-1 block text-sm text-kumo-subtle">{c.question}</span>
-                  </LayerCard>
-                </Link>
+                <LinkCard href={`/consult/${c.slug}/`} title={c.title} note={c.question} />
               </li>
             ))}
           </ul>

@@ -1,7 +1,7 @@
 import { Badge, LayerCard, Link } from "@cloudflare/kumo";
-import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { LinkCard } from "~/components/LinkCard";
 import { SiteHeader } from "~/components/SiteHeader";
 import { consultations } from "~/content/consultations";
 import { pageHead, SPEC_URL } from "~/content/site";
@@ -43,7 +43,7 @@ function Home() {
                 The problem
               </h2>
             </LayerCard.Secondary>
-            <LayerCard.Primary className="p-5">
+            <LayerCard.Primary className="flex-1 p-5">
               <p className="mb-3">Today, most submissions are free text in an email or a message:</p>
               <blockquote className="mb-3 border-l-2 border-kumo-line pl-4 text-kumo-subtle italic">
                 “Good lad, played in X league, 10 goals, plays centre mid, available now.”
@@ -65,7 +65,7 @@ function Home() {
                 The goal
               </h2>
             </LayerCard.Secondary>
-            <LayerCard.Primary className="p-5">
+            <LayerCard.Primary className="flex-1 p-5">
               <ul className="mb-0 list-none space-y-3 pl-0">
                 <Goal title="Clubs get information that they can use.">
                   The same fields in the same format from every sender, with minutes for every output and a source for
@@ -135,11 +135,11 @@ function Home() {
         </section>
 
         <nav aria-label="Main links" className="mb-12 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
-          <Door href="/build/" title="Create a submission" note="In your browser. Your data stays on your device." className="lg:col-span-3" />
-          <Door href="/view/" title="View a submission" note="Open a file from an agent. The file stays on your device." className="lg:col-span-3" />
-          <Door href={SPEC_URL} title="Read the specification" note="The normative document, in fourteen sections" className="lg:col-span-2" />
-          <Door href="/schema/v0.1/player.json" title="Get the schema" note="JSON Schema 2020-12, at a permanent URL" className="lg:col-span-2" />
-          <Door href="/consult/" title="Take part" note="Help decide what goes into FPDS" className="sm:col-span-2 lg:col-span-2" />
+          <LinkCard href="/build/" title="Create a submission" note="In your browser. Your data stays on your device." className="lg:col-span-3" />
+          <LinkCard href="/view/" title="View a submission" note="Open a file from an agent. The file stays on your device." className="lg:col-span-3" />
+          <LinkCard href={SPEC_URL} title="Read the specification" note="The normative document, in fourteen sections" className="lg:col-span-2" />
+          <LinkCard href="/schema/v0.1/player.json" title="Get the schema" note="JSON Schema 2020-12, at a permanent URL" className="lg:col-span-2" />
+          <LinkCard href="/consult/" title="Take part" note="Help decide what goes into FPDS" className="sm:col-span-2 lg:col-span-2" />
         </nav>
 
         <div className="prose-block">
@@ -235,19 +235,5 @@ function Claim({ label, value, mark, kind }: { label: string; value: string; mar
         <Badge variant={kind === "checked" ? "info" : "warning"}>{mark}</Badge>
       </dd>
     </>
-  );
-}
-
-function Door({ title, note, href, className = "" }: { title: string; note: string; href: string; className?: string }) {
-  return (
-    <Link href={href} variant="plain" className={`block no-underline ${className}`}>
-      <LayerCard className="group h-full p-4 transition-colors hover:bg-kumo-tint">
-        <span className="flex items-center justify-between gap-2 font-semibold text-kumo-link">
-          {title}
-          <ArrowRightIcon aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" />
-        </span>
-        <span className="mt-1 block text-sm text-kumo-subtle">{note}</span>
-      </LayerCard>
-    </Link>
   );
 }

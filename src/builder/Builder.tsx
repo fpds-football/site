@@ -220,7 +220,9 @@ export function Builder() {
         <aside
           aria-label="Preview and export"
           // The panel is taller than many screens. It scrolls inside itself, so the end of the preview is always reachable.
-          className="min-w-0 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:pb-2"
+          // A scrolling panel clips what is outside its box, and Kumo draws card borders as a ring outside the card.
+          // A small padding keeps the rings visible, and the same negative margin keeps the cards aligned with the grid.
+          className="min-w-0 lg:sticky lg:top-3 lg:-mx-1 lg:-mt-1 lg:max-h-[calc(100dvh-1.5rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:px-1 lg:pt-1 lg:pb-2"
         >
           <LayerCard className="mb-3">
             <LayerCard.Primary className="p-4">
