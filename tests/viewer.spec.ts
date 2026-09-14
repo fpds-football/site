@@ -52,6 +52,33 @@ test("a valid file renders with no banner, and its source badges match its prove
   await expect(card.getByRole("region", { name: "About this file" })).toContainText("b7f3c2e1-4a9d-4f11-9c3e-2a1d5f8b0c44");
 });
 
+test("video links open in a new tab only when the reader selects them", async ({ page }) => {
+  await openFile(page, "midfielder-under-contract.fpds.json");
+  const video = page.getByRole("article", { name: "Submission preview" }).getByRole("region", { name: "Video" });
+
+  const items = video.getByRole("listitem");
+  await expect(items).toHaveCount(2);
+  await expect(items.nth(0)).toContainText("Highlights");
+  await expect(items.nth(1)).toContainText("Full match");
+  await expect(items.nth(0)).toContainText("Stated by agent");
+
+  const link = video.getByRole("link", { name: "https://video.example/wojcik-highlights-2025-26" });
+  await expect(link).toHaveAttribute("href", "https://video.example/wojcik-highlights-2025-26");
+  await expect(link).toHaveAttribute("target", "_blank");
+  await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+});
+
+test("a media URL that is not https is not a link, and shows the problem", async ({ page }) => {
+  const document = JSON.parse(fixture("midfielder-under-contract.fpds.json").toString());
+  document.media[0].url = "javascript:alert(1)";
+  await openFile(page, "script-link.fpds.json", Buffer.from(JSON.stringify(document)));
+
+  const first = page.getByRole("region", { name: "Video" }).getByRole("listitem").first();
+  await expect(first).toContainText("javascript:alert(1)");
+  await expect(first.getByRole("link")).toHaveCount(0);
+  await expect(first.getByTestId("issue-notes")).toContainText("Media link 1: URL has the wrong format.");
+});
+
 test("a dropped file opens", async ({ page }) => {
   const contents = fixture("free-agent-minimal.fpds.json").toString();
   const dataTransfer = await page.evaluateHandle((text) => {

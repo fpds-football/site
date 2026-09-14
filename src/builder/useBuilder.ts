@@ -87,7 +87,7 @@ export function useBuilder() {
       const blocking = blockers.some((issue) => sectionFor(issue.path) === section.id);
       const empty = section.prefixes.every((prefix) => getAt(cleaned, prefix) === undefined);
       const optional =
-        section.id === "performance" || (section.id === "representation" && fields["/representation"]?.state !== "required");
+        section.id === "performance" || section.id === "media" || (section.id === "representation" && fields["/representation"]?.state !== "required");
       statuses[section.id] = blocking ? "incomplete" : optional && empty ? "optional" : "complete";
     }
     return statuses;

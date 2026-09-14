@@ -60,6 +60,18 @@
       "assists": 4
     }
   ],
+  "media": [
+    {
+      "type": "video",
+      "video_type": "highlights",
+      "url": "https://video.example/wojcik-highlights-2025-26"
+    },
+    {
+      "type": "video",
+      "video_type": "full_match",
+      "url": "https://video.example/widzew-legia-2026-03-08"
+    }
+  ],
   "consent": {
     "lawful_basis": "consent",
     "consent_date": "2026-07-02",

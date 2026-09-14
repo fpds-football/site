@@ -80,6 +80,9 @@ export function SectionForm({ section, builder }: { section: SectionId; builder:
     case "performance":
       return <PerformanceFields builder={builder} />;
 
+    case "media":
+      return <MediaFields builder={builder} />;
+
     case "consent":
       return (
         <>
@@ -193,6 +196,50 @@ function PerformanceFields({ builder }: { builder: Builder }) {
       })}
       <Button icon={<PlusIcon />} onClick={() => builder.set(`/performance/${rows.length}`, { season: "" })}>
         Add a season
+      </Button>
+    </>
+  );
+}
+
+function MediaFields({ builder }: { builder: Builder }) {
+  const rows = (builder.get("/media") as unknown[] | undefined) ?? [];
+
+  return (
+    <>
+      <p className="mb-4 text-sm text-kumo-subtle">
+        Add a link to each video of the player. Clubs do not assess a player without video. Use a link that the club can open.
+      </p>
+      {rows.map((_, index) => {
+        const base = `/media/${index}`;
+        return (
+          <LayerCard key={index} render={<fieldset />} className="mb-5" data-row={index}>
+            <LayerCard.Secondary className="flex flex-wrap items-center justify-between gap-2">
+              <legend className="float-left font-semibold">Video {index + 1}</legend>
+              <div className="flex flex-wrap items-center gap-2">
+                <SourceControl builder={builder} pointer={base} />
+                <Button size="sm" variant="secondary-destructive" icon={<TrashIcon />} onClick={() => builder.set(base, undefined)}>
+                  Remove this video
+                </Button>
+              </div>
+            </LayerCard.Secondary>
+            <LayerCard.Primary className="p-4">
+              <SelectField
+                builder={builder}
+                pointer={`${base}/video_type`}
+                label="Type of video"
+                options={{
+                  highlights: "Highlights: selected actions from one or more matches",
+                  full_match: "Full match",
+                }}
+              />
+              <TextField builder={builder} pointer={`${base}/url`} label="Link" hint="The full link, starting with https://." placeholder="https://" />
+            </LayerCard.Primary>
+          </LayerCard>
+        );
+      })}
+      {/* FPDS 0.1 has one media type, so the builder sets it. */}
+      <Button icon={<PlusIcon />} onClick={() => builder.set(`/media/${rows.length}`, { type: "video" })}>
+        Add a video
       </Button>
     </>
   );

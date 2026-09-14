@@ -86,6 +86,23 @@ test("exports a valid submission that the library accepts", async ({ page }) => 
   expect(document.representation).toBeUndefined();
 });
 
+test("a video link goes into the export, and a link that is not https shows the problem", async ({ page }) => {
+  await fillFreeAgent(page);
+
+  await section(page, "Video");
+  await page.getByRole("button", { name: "Add a video" }).click();
+  await choose(page, "Type of video", /^Full match$/);
+  await page.getByLabel("Link").fill("http://video.example/okoye-v-leeds");
+  await expect(page.locator('[data-field="/media/0/url"]')).toContainText("starts with https://");
+
+  await page.getByLabel("Link").fill("https://video.example/okoye-v-leeds");
+  await expect(page.locator('[data-field="/media/0/url"]')).not.toContainText("wrong format");
+
+  const { document } = await exportDocument(page);
+  expect(validate(document).issues).toEqual([]);
+  expect(document.media).toEqual([{ type: "video", video_type: "full_match", url: "https://video.example/okoye-v-leeds" }]);
+});
+
 test("each export of the same draft has a new submission ID", async ({ page }) => {
   await fillFreeAgent(page);
   const first = await exportDocument(page);

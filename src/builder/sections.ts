@@ -1,4 +1,4 @@
-export type SectionId = "submission" | "player" | "positions" | "contract" | "representation" | "performance" | "consent";
+export type SectionId = "submission" | "player" | "positions" | "contract" | "representation" | "performance" | "media" | "consent";
 
 export interface SectionDefinition {
   id: SectionId;
@@ -14,6 +14,7 @@ export const SECTIONS: SectionDefinition[] = [
   { id: "contract", title: "Contract", prefixes: ["/contract"] },
   { id: "representation", title: "Representation", prefixes: ["/representation"] },
   { id: "performance", title: "Performance", prefixes: ["/performance"] },
+  { id: "media", title: "Video", prefixes: ["/media"] },
   { id: "consent", title: "Consent", prefixes: ["/consent"] },
 ];
 

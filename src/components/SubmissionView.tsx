@@ -1,6 +1,6 @@
 import { Badge, LayerCard } from "@cloudflare/kumo";
 import { type Issue, VALUE_LABELS } from "@fpds-football/fpds";
-import { ShieldWarningIcon, WarningCircleIcon, WarningIcon } from "@phosphor-icons/react";
+import { ArrowSquareOutIcon, ShieldWarningIcon, WarningCircleIcon, WarningIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { countryName } from "~/content/countries";
 
@@ -155,6 +155,7 @@ const escapeToken = (token: string) => token.replaceAll("~", "~0").replaceAll("/
 export function anchorFor(path: string): string | undefined {
   const [, first, second] = path.split("/");
   if (first === "performance") return second === undefined ? "/performance" : /^\d+$/.test(second) ? `/performance/${second}` : undefined;
+  if (first === "media") return second === undefined ? "/media" : /^\d+$/.test(second) ? `/media/${second}` : undefined;
   if (first === "extensions") return second === undefined ? "/extensions" : `/extensions/${second}`;
   const row = ROW_POINTERS.find((pointer) => path === pointer || path.startsWith(`${pointer}/`));
   return row && (SHARED_ROWS[row] ?? row);
@@ -186,6 +187,7 @@ export function SubmissionView({
   const parentClub = asRecord(contract.parent_club);
   const representation = document.representation === undefined ? undefined : asRecord(document.representation);
   const performance = asArray(document.performance).map(asRecord);
+  const media = asArray(document.media).map(asRecord);
   const extensions = asRecord(document.extensions);
 
   const issuesAt = (anchor: string) => issues.filter((issue) => anchorFor(issue.path) === anchor);
@@ -313,11 +315,63 @@ export function SubmissionView({
           </section>
         ) : null}
 
+        {media.length > 0 || issuesAt("/media").length > 0 ? (
+          <section aria-label="Video" data-anchor="/media" tabIndex={-1} className="mt-4 scroll-mt-4 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand">
+            <h3 className="mb-2 text-sm font-semibold text-kumo-strong">Video</h3>
+            <IssueNotes issues={issuesAt("/media")} />
+            <ul className="m-0 list-none space-y-2 p-0">
+              {media.map((item, index) => {
+                const anchor = `/media/${index}`;
+                const itemIssues = issuesAt(anchor);
+                const url = asText(item.url);
+                const href = url && isHttpsLink(url) ? url : undefined;
+                return (
+                  <li
+                    key={`${url}-${index}`}
+                    data-anchor={anchor}
+                    tabIndex={-1}
+                    className={`scroll-mt-4 break-inside-avoid rounded-md border px-3 py-2.5 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand ${problemTone(itemIssues, "border-kumo-hairline bg-kumo-tint")}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="min-w-0 font-medium text-kumo-strong">{label(VALUE_LABELS.video_type, item.video_type) ?? "Video"}</span>
+                      <Mark source={sourceOf(document, anchor)} />
+                    </div>
+                    <p className="m-0 mt-1 min-w-0 text-sm break-all">
+                      {href ? (
+                        // The viewer never loads the video. The link opens only when the reader selects it (§9.3).
+                        <a href={href} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" className="text-kumo-link underline decoration-1 underline-offset-2">
+                          {href}
+                          <ArrowSquareOutIcon aria-hidden="true" className="ml-1 inline align-[-2px]" />
+                        </a>
+                      ) : (
+                        (url ?? NOT_IN_FILE)
+                      )}
+                    </p>
+                    <IssueNotes issues={itemIssues} />
+                  </li>
+                );
+              })}
+            </ul>
+            {media.length > 0 ? (
+              <p className="mt-1.5 mb-0 text-xs text-kumo-subtle">Each link opens on another site. The other site can see that you opened it.</p>
+            ) : null}
+          </section>
+        ) : null}
+
         <SubmissionDetails submission={submission} consent={consent} issuesAt={issuesAt} />
         <Extensions extensions={extensions} issuesAt={issuesAt} />
       </LayerCard.Primary>
     </LayerCard>
   );
+}
+
+/** Only an https link becomes a link. A file from another producer can contain any text, for example a javascript: URL. */
+function isHttpsLink(value: string): boolean {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 /** Background and border for a season with problems: red for an error, amber for a warning only. */
