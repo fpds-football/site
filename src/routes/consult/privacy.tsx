@@ -5,10 +5,10 @@ import { SiteHeader } from "~/components/SiteHeader";
 import { pageHead } from "~/content/site";
 
 /**
- * MAINTAINER: before launch, set CONTROLLER_NAME to the legal name of the data controller (a person or a company),
- * confirm the retention periods, and confirm the facts about Tally against the current Tally data processing agreement.
+ * MAINTAINER: confirm the retention periods, and confirm the facts about Tally against the current Tally data processing
+ * agreement.
  */
-const CONTROLLER_NAME = "CONTROLLER_NAME";
+const CONTROLLER_NAME = "Andy Coupe";
 
 export const Route = createFileRoute("/consult/privacy")({
   head: () =>
@@ -46,7 +46,6 @@ function Privacy() {
               <li>The consultation that you answer</li>
               <li>Your role, for example agent, club staff or player</li>
               <li>Your answer</li>
-              <li>The idea that is closest to your view, if you choose one</li>
               <li>Your name, if you give it</li>
               <li>Your email address, if you give it</li>
             </ul>
@@ -68,7 +67,7 @@ function Privacy() {
 
           <Section heading="What we publish">
             <ul>
-              <li>The summary shows the number of answers from each role, and for each idea.</li>
+              <li>The summary shows the number of answers from each role.</li>
               <li>The summary can quote a comment. A quote never includes a name, an email address or an organisation.</li>
               <li>We do not publish individual answers.</li>
             </ul>

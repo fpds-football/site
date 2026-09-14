@@ -18,7 +18,7 @@ export interface Consultation {
   caseFor: string[];
   againstHeading: string;
   caseAgainst: string[];
-  /** Ideas to start the discussion. They are not a closed list. The letters match the "closest idea" question in the form. */
+  /** Ideas to start the discussion. They are not a closed list. */
   ideas: { label: string; text: string }[];
   ideasNote?: string;
   answerNote: string;
@@ -28,7 +28,7 @@ export interface Consultation {
  * The ID of the one Tally form that all consultations use (DECISIONS.md D-44 in the spec repository).
  * Until it is set, each page says that the form opens when the consultation opens.
  */
-export const TALLY_FORM_ID: string | undefined = undefined;
+export const TALLY_FORM_ID: string | undefined = "NpaEqp";
 
 /**
  * The questions to create in the Tally form, for the maintainer. They are not shown on the page.
@@ -36,12 +36,11 @@ export const TALLY_FORM_ID: string | undefined = undefined;
  */
 export const TALLY_FORM_QUESTIONS = [
   'Hidden field: "consultation"',
-  "Your role (required): Agent or intermediary / Club staff / Club medical staff / Player / Parent or guardian / Data or software provider / Other",
-  'Your answer (required, long text). Help text: "Do not write about the health, wages or contract of a specific person."',
-  "Which idea is closest to your view? (optional): A / B / C / D / None of these / Not sure",
   "Your name (optional)",
-  "Email address, if you want the summary (optional)",
-  'Confirmation (required): "I am 18 or older, and I have read the privacy notice at https://fpds.football/consult/privacy/"',
+  "Your role (required): Intermediary (FIFA-licensed) / Scout / Head of Recruitment / Sporting Director / Unlicensed Agent / Player / Parent / Medical / Other",
+  "Your answer (required, long text)",
+  "Email (optional)",
+  'Confirmation (required): "I am 18 or older and have read the privacy notice"',
 ] as const;
 
 export const consultations: Consultation[] = [

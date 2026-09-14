@@ -22,8 +22,8 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
           <LayerCard.Primary className="p-5">
             <dl className="m-0 grid grid-cols-1 gap-x-5 gap-y-1 sm:grid-cols-[minmax(8rem,11rem)_1fr]">
               <Fact term="Status">
-                <Badge variant="neutral" icon={<ClockIcon />}>
-                  Opens when FPDS launches
+                <Badge variant="success" icon={<CheckCircleIcon />}>
+                  Open
                 </Badge>
               </Fact>
               <Fact term="Open for">At least 14 days</Fact>
@@ -68,7 +68,7 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
           {c.ideasNote ? <p className="text-sm text-kumo-subtle">{c.ideasNote}</p> : null}
 
           <h2 className="section-heading">Give your answer</h2>
-          <p>Write your answer in your own words. The form also asks which idea is closest to your view.</p>
+          <p>Write your answer in your own words.</p>
           {TALLY_FORM_ID ? (
             <iframe
               src={`https://tally.so/embed/${TALLY_FORM_ID}?alignLeft=1&hideTitle=1&transparentBackground=1&consultation=${c.slug}`}
