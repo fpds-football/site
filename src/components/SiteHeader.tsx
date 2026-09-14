@@ -1,10 +1,10 @@
 import { Link } from "@cloudflare/kumo";
 import type { ReactNode } from "react";
 
-export function SiteHeader({ children }: { children?: ReactNode }) {
+export function SiteHeader({ children, wide = false }: { children?: ReactNode; wide?: boolean }) {
   return (
     <header className="border-b border-kumo-line bg-kumo-base pt-7 pb-5">
-      <div className="wrap">
+      <div className={wide ? "mx-auto max-w-[84rem] px-6" : "wrap"}>
         <p className="m-0 flex flex-wrap items-baseline gap-3 text-2xl font-semibold tracking-[-0.015em] text-kumo-strong">
           <Link href="/" variant="plain" className="text-kumo-strong">
             FPDS

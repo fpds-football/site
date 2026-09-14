@@ -57,6 +57,8 @@ test("each page has link preview tags and a canonical URL", async ({ page }) => 
 
 test("a link to a consultation navigates without a full page load", async ({ page }) => {
   await page.goto("/");
+  // Before hydration, a click is a normal page load. Wait until TanStack Start has hydrated the page.
+  await expect.poll(() => page.evaluate(() => typeof (window as { $_TSR?: unknown }).$_TSR)).toBe("undefined");
   await page.evaluate(() => {
     (window as { marker?: string }).marker = "same-document";
   });

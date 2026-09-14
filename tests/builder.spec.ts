@@ -210,8 +210,9 @@ test("every form control has text of 16px or more, so iOS Safari does not zoom o
   await choose(page, "Who sends this submission?", "An intermediary, for example an agent");
   await section(page, "Player");
   await page.getByLabel("Full name").fill("Daniel Okoye");
-  await page.getByRole("combobox", { name: "Source", exact: true }).first().click();
-  await page.getByRole("option", { name: "Verified" }).click();
+  await page.getByRole("button", { name: /^Source:/ }).first().click();
+  await page.getByRole("menuitemradio", { name: "Verified" }).click();
+  await expect(page.getByLabel("Verified against")).toBeVisible();
   await section(page, "Performance");
   await page.getByRole("button", { name: "Add a season" }).click();
 
@@ -233,4 +234,40 @@ test("the country search finds the football nations of the United Kingdom", asyn
   await expect(page.getByRole("list", { name: "Selected nationalities" })).toContainText("Scotland");
   // The search box is empty again, ready for the next country.
   await expect(page.getByRole("combobox", { name: /^Nationalities\b/ })).toHaveValue("");
+});
+
+test("the source of a value appears in its own label row, and a verified source asks what it was checked against", async ({ page }) => {
+  await section(page, "Player");
+  await page.getByLabel("Full name").fill("Daniel Okoye");
+
+  const field = page.locator('[data-field="/player/full_name"]');
+  const sourceButton = field.getByRole("button", { name: /^Source: Stated by agent/ });
+  await expect(sourceButton).toBeVisible();
+
+  // The source control shares a row with the label of its own field.
+  const [labelBox, sourceBox] = await Promise.all([field.locator("label").first().boundingBox(), sourceButton.boundingBox()]);
+  expect(Math.abs((labelBox?.y ?? 0) + (labelBox?.height ?? 0) / 2 - ((sourceBox?.y ?? 0) + (sourceBox?.height ?? 0) / 2))).toBeLessThan(8);
+
+  await sourceButton.click();
+  await page.getByRole("menuitemradio", { name: "Verified" }).click();
+  await expect(field.getByRole("button", { name: /^Source: Verified/ })).toBeVisible();
+  await expect(field.getByLabel("Verified against")).toBeVisible();
+});
+
+test("opening selects, menus, the country search and the dialog causes no Content Security Policy violation", async ({ page }) => {
+  const violations: string[] = [];
+  page.on("console", (message) => {
+    if (message.text().includes("Content Security Policy")) violations.push(message.text());
+  });
+
+  await choose(page, "Who sends this submission?", "The player");
+  await section(page, "Player");
+  await page.getByLabel("Full name").fill("Daniel Okoye");
+  await page.getByRole("button", { name: /^Source:/ }).first().click();
+  await page.getByRole("menuitemradio", { name: "Data provider" }).click();
+  await chooseCountry(page, "Nationalities", "Nigeria", /Nigeria \(NGA\)/);
+  await page.getByRole("button", { name: "Clear everything" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Cancel" }).click();
+
+  expect(violations).toEqual([]);
 });

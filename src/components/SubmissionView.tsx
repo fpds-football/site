@@ -1,4 +1,4 @@
-import { Badge, Banner, LayerCard, Table } from "@cloudflare/kumo";
+import { Badge, LayerCard } from "@cloudflare/kumo";
 import { VALUE_LABELS } from "@fpds-football/fpds";
 import { WarningIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
@@ -63,24 +63,21 @@ export function SubmissionView({ document, isMinor }: { document: Doc; isMinor?:
 
   return (
     <LayerCard render={<article />} aria-label="Submission preview">
-      <LayerCard.Secondary className="flex flex-wrap items-baseline justify-between gap-3">
-        <span className="text-lg font-semibold text-kumo-strong">{player.full_name || "Player name"}</span>
-        <span className="text-sm text-kumo-subtle">{meta.join(" · ")}</span>
+      <LayerCard.Secondary>
+        <div className="flex items-center justify-between gap-3">
+          <span className="truncate text-lg font-semibold text-kumo-strong">{player.full_name || "Player name"}</span>
+          {isMinor ? (
+            <span data-testid="minor-badge" className="shrink-0">
+              <Badge variant="warning" icon={<WarningIcon weight="fill" />}>
+                Minor
+              </Badge>
+            </span>
+          ) : null}
+        </div>
+        {meta.length > 0 ? <p className="m-0 mt-0.5 text-sm text-kumo-subtle">{meta.join(" · ")}</p> : null}
       </LayerCard.Secondary>
       <LayerCard.Primary className="p-4">
-        {isMinor ? (
-          <div className="mb-3" data-testid="minor-badge">
-            <Banner
-              variant="alert"
-              size="sm"
-              icon={<WarningIcon weight="fill" />}
-              title="Minor"
-              description="This player is less than 18 years old. Safeguarding rules apply."
-            />
-          </div>
-        ) : null}
-
-        <dl className="m-0 grid grid-cols-1 gap-x-4 sm:grid-cols-[minmax(6rem,9rem)_1fr]">
+        <dl className="m-0 divide-y divide-kumo-hairline">
           <Row term="Purposes" value={purposes.map((p) => label(VALUE_LABELS.purposes, p)).join(", ")} />
           <Row term="Nationalities" value={(player.nationalities ?? []).map(countryName).join(", ")} source={sourceOf(document, "/player/nationalities")} />
           <Row term="Date of birth" value={formatDate(player.date_of_birth)} source={sourceOf(document, "/player/date_of_birth")} />
@@ -103,42 +100,30 @@ export function SubmissionView({ document, isMinor }: { document: Doc; isMinor?:
         </dl>
 
         {performance.length > 0 ? (
-          <div className="mt-3">
-            <p className="mb-1 font-semibold">Performance</p>
-            <div className="overflow-x-auto rounded-md border border-kumo-line">
-              <Table className="min-w-[28rem] text-sm">
-                <Table.Header>
-                  <Table.Row>
-                    <Table.Head>Season</Table.Head>
-                    <Table.Head>Competition</Table.Head>
-                    <Table.Head className="text-right">Apps</Table.Head>
-                    <Table.Head className="text-right">Mins</Table.Head>
-                    <Table.Head className="text-right">G</Table.Head>
-                    <Table.Head className="text-right">A</Table.Head>
-                    <Table.Head className="text-right">CS</Table.Head>
-                    <Table.Head>Source</Table.Head>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {performance.map((row, index) => (
-                    <Table.Row key={`${row.season}-${index}`}>
-                      <Table.Cell>{row.season}</Table.Cell>
-                      <Table.Cell>{row.competition}</Table.Cell>
-                      <Table.Cell className="text-right">{row.appearances ?? "–"}</Table.Cell>
-                      <Table.Cell className="text-right">{row.minutes ?? "–"}</Table.Cell>
-                      <Table.Cell className="text-right">{row.goals ?? "–"}</Table.Cell>
-                      <Table.Cell className="text-right">{row.assists ?? "–"}</Table.Cell>
-                      <Table.Cell className="text-right">{row.clean_sheets ?? "–"}</Table.Cell>
-                      <Table.Cell>
-                        <Mark source={sourceOf(document, `/performance/${index}`)} />
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-            </div>
-            <p className="mt-1 text-xs text-kumo-subtle">A dash means that the value is not stated. It does not mean zero.</p>
-          </div>
+          <section aria-label="Performance" className="mt-4">
+            <h3 className="mb-2 text-sm font-semibold text-kumo-strong">Performance</h3>
+            <ul className="m-0 list-none space-y-2 p-0">
+              {performance.map((row, index) => (
+                <li key={`${row.season}-${index}`} className="rounded-md border border-kumo-hairline bg-kumo-tint px-3 py-2.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="min-w-0 font-medium text-kumo-strong">
+                      {row.season}
+                      {row.competition ? <span className="font-normal text-kumo-subtle"> · {row.competition}</span> : null}
+                    </span>
+                    <Mark source={sourceOf(document, `/performance/${index}`)} />
+                  </div>
+                  <dl className="m-0 mt-2 grid grid-cols-5 gap-2 text-center">
+                    <Stat term="Apps" value={row.appearances} />
+                    <Stat term="Mins" value={row.minutes} />
+                    <Stat term="Goals" value={row.goals} />
+                    <Stat term="Assists" value={row.assists} />
+                    <Stat term="Clean sheets" short="CS" value={row.clean_sheets} />
+                  </dl>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-1.5 mb-0 text-xs text-kumo-subtle">A dash means that the value is not stated. It does not mean zero.</p>
+          </section>
         ) : null}
       </LayerCard.Primary>
     </LayerCard>
@@ -147,17 +132,31 @@ export function SubmissionView({ document, isMinor }: { document: Doc; isMinor?:
 
 function Row({ term, value, source }: { term: string; value: ReactNode; source?: Source }) {
   if (value === undefined || value === "" || value === null) return null;
+  // Three columns: term, value, source. The source badges line up in one column, so they never wrap under a value.
   return (
-    <>
-      <dt className="pt-1 text-sm text-kumo-subtle sm:py-1.5">{term}</dt>
-      <dd className="m-0 flex flex-wrap items-center gap-2 pb-2 sm:py-1.5">
-        <span className={source && !source.checked ? "italic" : "text-kumo-strong"}>{value}</span>
-        {source ? <Mark source={source} /> : null}
-      </dd>
-    </>
+    <div className="grid grid-cols-[minmax(5.5rem,7.5rem)_minmax(0,1fr)_auto] items-baseline gap-x-3 py-2">
+      <dt className="text-sm text-kumo-subtle">{term}</dt>
+      <dd className={`m-0 min-w-0 ${source && !source.checked ? "italic" : "text-kumo-strong"}`}>{value}</dd>
+      <dd className="m-0 justify-self-end">{source ? <Mark source={source} /> : null}</dd>
+    </div>
+  );
+}
+
+function Stat({ term, short, value }: { term: string; short?: string; value: unknown }) {
+  return (
+    <div>
+      <dt className="text-[11px] tracking-wide text-kumo-subtle uppercase">
+        {short ? <abbr title={term} className="no-underline">{short}</abbr> : term}
+      </dt>
+      <dd className="m-0 font-medium text-kumo-strong tabular-nums">{typeof value === "number" ? value.toLocaleString("en-GB") : "–"}</dd>
+    </div>
   );
 }
 
 function Mark({ source }: { source: Source }) {
-  return <Badge variant={source.checked ? "info" : "warning"}>{source.label}</Badge>;
+  return (
+    <Badge variant={source.checked ? "info" : "warning"} className="whitespace-nowrap">
+      {source.label}
+    </Badge>
+  );
 }

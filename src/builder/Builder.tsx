@@ -100,7 +100,6 @@ export function Builder() {
   const current = SECTIONS[index] ?? SECTIONS[0];
   const previous = SECTIONS[index - 1];
   const next = SECTIONS[index + 1];
-  const sectionConflicts = builder.conflicts.filter((issue) => sectionFor(issue.path) === section);
 
   return (
     <div className="mx-auto max-w-[84rem] px-6 pb-10">
@@ -198,9 +197,6 @@ export function Builder() {
           >
             {current?.title}
           </h2>
-          {sectionConflicts.length > 0 ? (
-            <p className="mb-4 text-sm text-kumo-danger">This section has a conflict. See the message under the field.</p>
-          ) : null}
           <SectionForm section={section} builder={builder} />
           <div className="mt-8 flex justify-between border-t border-kumo-line pt-4">
             {previous ? (
@@ -219,7 +215,11 @@ export function Builder() {
           </div>
         </section>
 
-        <aside aria-label="Preview and export" className="min-w-0 lg:sticky lg:top-4 lg:self-start">
+        <aside
+          aria-label="Preview and export"
+          // The panel is taller than many screens. It scrolls inside itself, so the end of the preview is always reachable.
+          className="min-w-0 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:pb-2"
+        >
           <LayerCard className="mb-3">
             <LayerCard.Primary className="p-4">
               <Button

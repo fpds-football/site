@@ -9,7 +9,7 @@ import {
   FieldShell,
   NumberField,
   SelectField,
-  SourcePicker,
+  SourceControl,
   TextField,
 } from "./fields";
 import type { SectionId } from "./sections";
@@ -108,9 +108,9 @@ export function SectionForm({ section, builder }: { section: SectionId; builder:
 function ClubFields({ builder, pointer, label, hint }: { builder: Builder; pointer: string; label: string; hint?: string }) {
   const field = builder.fieldState(pointer);
   return (
-    <FieldShell builder={builder} pointer={pointer} label={label} {...(hint ? { hint } : {})} source>
+    <FieldShell builder={builder} pointer={pointer} label={label} {...(hint ? { hint } : {})} source group>
       {() => (
-        <div className="border-l-2 border-kumo-line pl-4" data-state={field.state}>
+        <div className="grid grid-cols-1 gap-x-4 rounded-lg border border-kumo-line bg-kumo-base p-4 pb-0 sm:grid-cols-2" data-state={field.state}>
           <TextField builder={builder} pointer={`${pointer}/name`} label="Club name" />
           <CountryField builder={builder} pointer={`${pointer}/country`} label="Country" />
         </div>
@@ -165,7 +165,7 @@ function PerformanceFields({ builder }: { builder: Builder }) {
             <LayerCard.Secondary className="flex flex-wrap items-center justify-between gap-2">
               <legend className="float-left font-semibold">Season record {index + 1}</legend>
               <div className="flex flex-wrap items-center gap-2">
-                <SourcePicker builder={builder} pointer={base} />
+                <SourceControl builder={builder} pointer={base} />
                 <Button size="sm" variant="secondary-destructive" icon={<TrashIcon />} onClick={() => builder.set(base, undefined)}>
                   Remove this season
                 </Button>

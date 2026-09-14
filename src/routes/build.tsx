@@ -24,7 +24,7 @@ export const Route = createFileRoute("/build")({
 function BuildPage() {
   return (
     <>
-      <SiteHeader>Create a submission</SiteHeader>
+      <SiteHeader wide />
       <main>
         <Builder />
       </main>

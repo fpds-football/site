@@ -25,12 +25,19 @@ function asParsed(script) {
   return script.replace(/\r\n?/g, "\n").replaceAll("\u0000", "\uFFFD");
 }
 
+/**
+ * Style elements that libraries insert at runtime, allowed by hash. The policy allows no other inline style.
+ * - Base UI (inside Kumo Select) renders a <style> element that hides the scrollbar of the popup. React inserts it.
+ * If a Kumo or Base UI upgrade changes this style, tests/builder.spec.ts fails on the new violation and prints its hash.
+ */
+const RUNTIME_STYLE_HASHES = ["kLmvWqfziFavKtqHqRsb90f006UAK2Dmd0It5Iz2KFA="];
+
 function policy(hashes) {
   const scriptSources = ["'self'", ...hashes.map((hash) => `'sha256-${hash}'`)].join(" ");
   return [
     "default-src 'self'",
     `script-src ${scriptSources}`,
-    "style-src 'self'",
+    `style-src 'self' ${RUNTIME_STYLE_HASHES.map((hash) => `'sha256-${hash}'`).join(" ")}`,
     "img-src 'self' data:",
     "font-src 'self'",
     "connect-src 'self'",
