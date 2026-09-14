@@ -1,6 +1,6 @@
 import { Badge, Banner, LayerCard, Link } from "@cloudflare/kumo";
 import { CheckCircleIcon, ClockIcon, XCircleIcon } from "@phosphor-icons/react/dist/ssr";
-import type { Consultation } from "~/content/consultations";
+import { type Consultation, TALLY_FORM_ID } from "~/content/consultations";
 import { DECISIONS_URL } from "~/content/site";
 import { SiteHeader } from "./SiteHeader";
 
@@ -51,22 +51,27 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
         </div>
 
         <div className="prose-block">
-          <h2 className="section-heading">The options</h2>
+          <h2 className="section-heading">Some ideas</h2>
+          <p>
+            These ideas start the discussion. They are not the only answers. Agree with one, change one, or tell us
+            something different.
+          </p>
           <ol className="!mb-4 !list-none space-y-2.5 !pl-0">
-            {c.options.map((option) => (
-              <li key={option.label} className="!m-0">
+            {c.ideas.map((idea) => (
+              <li key={idea.label} className="!m-0">
                 <LayerCard className="px-4 py-3">
-                  <strong className="block text-kumo-strong">{option.label}</strong> {option.text}
+                  <strong className="block text-kumo-strong">{idea.label}</strong> {idea.text}
                 </LayerCard>
               </li>
             ))}
           </ol>
-          {c.optionsNote ? <p className="text-sm text-kumo-subtle">{c.optionsNote}</p> : null}
+          {c.ideasNote ? <p className="text-sm text-kumo-subtle">{c.ideasNote}</p> : null}
 
           <h2 className="section-heading">Give your answer</h2>
-          {c.tallyFormId ? (
+          <p>Write your answer in your own words. The form also asks which idea is closest to your view.</p>
+          {TALLY_FORM_ID ? (
             <iframe
-              src={`https://tally.so/embed/${c.tallyFormId}?alignLeft=1&hideTitle=1&transparentBackground=1`}
+              src={`https://tally.so/embed/${TALLY_FORM_ID}?alignLeft=1&hideTitle=1&transparentBackground=1&consultation=${c.slug}`}
               title={`Consultation form: ${c.title.toLowerCase()}`}
               loading="lazy"
               className="mb-4 h-[900px] w-full border-0"

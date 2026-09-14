@@ -41,7 +41,8 @@ This repository is the website at `https://fpds.football`. The specification is 
 ## Content
 
 - All text is Simple English (ASD-STE100, pragmatic mode), with British spelling. Use the `simple-english` skill. The homepage headline keeps its voice.
-- Consultations are data in `src/content/consultations.ts`. A new consultation is a new entry and a small route file. Copy the option labels exactly into the Tally form.
+- Consultations are data in `src/content/consultations.ts`. A new consultation is a new entry and a small route file. All consultations use one Tally form (`TALLY_FORM_ID`). The page sends the slug in the hidden field `consultation`. Do not make a form for each consultation.
+- The ideas on a consultation page are suggestions, not a closed list. The answer is free text. Keep the letters A to D, because the form asks which idea is closest.
 - Each page sets its title, description and Open Graph tags with `pageHead`.
 - Links use a trailing slash, for example `/consult/wages/`.
 

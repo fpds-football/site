@@ -56,6 +56,15 @@ test("each page has link preview tags and a canonical URL", async ({ page }) => 
   }
 });
 
+test("each consultation shows its ideas as suggestions and asks for an answer in the reader's own words", async ({ page }) => {
+  for (const slug of ["release-clauses", "medical-availability", "wages"]) {
+    await page.goto(`/consult/${slug}/`);
+    await expect(page.getByRole("heading", { level: 2, name: "Some ideas" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "The options" })).toHaveCount(0);
+    await expect(page.getByText("Write your answer in your own words.")).toBeVisible();
+  }
+});
+
 test("a link to a consultation navigates without a full page load", async ({ page }) => {
   await page.goto("/");
   // Before hydration, a click is a normal page load. Wait until TanStack Start has hydrated the page.

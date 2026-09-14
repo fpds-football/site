@@ -43,10 +43,11 @@ function Privacy() {
 
           <Section heading="The data that we collect">
             <ul>
+              <li>The consultation that you answer</li>
               <li>Your role, for example agent, club staff or player</li>
-              <li>Your answers to the questions</li>
-              <li>Your comment, if you write one</li>
-              <li>The country where you work, if you give it</li>
+              <li>Your answer</li>
+              <li>The idea that is closest to your view, if you choose one</li>
+              <li>Your name, if you give it</li>
               <li>Your email address, if you give it</li>
             </ul>
             <Banner variant="alert" className="mb-4" description="Do not write information about the health, wages or contract of a specific person." />
@@ -55,6 +56,7 @@ function Privacy() {
           <Section heading="Why we collect it">
             <ul>
               <li>We count the answers from each role and write a summary of the reasons.</li>
+              <li>If you give your name, we can contact you about your answer. We never publish it.</li>
               <li>We use the summary to decide what goes into FPDS.</li>
               <li>If you give your email address, we send you the summary. We do not send you other messages.</li>
             </ul>
@@ -66,7 +68,7 @@ function Privacy() {
 
           <Section heading="What we publish">
             <ul>
-              <li>The summary shows the number of answers from each role and each country.</li>
+              <li>The summary shows the number of answers from each role, and for each idea.</li>
               <li>The summary can quote a comment. A quote never includes a name, an email address or an organisation.</li>
               <li>We do not publish individual answers.</li>
             </ul>
@@ -81,8 +83,8 @@ function Privacy() {
 
           <Section heading="How long we keep it">
             <ul>
-              <li>We delete email addresses 30 days after we publish the summary.</li>
-              <li>We keep answers without email addresses for 24 months after the consultation closes. Then we delete them.</li>
+              <li>We delete names and email addresses 30 days after we publish the summary.</li>
+              <li>We keep answers without names and email addresses for 24 months after the consultation closes. Then we delete them.</li>
               <li>Published summaries stay public, because they are the record of the decision.</li>
             </ul>
           </Section>

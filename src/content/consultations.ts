@@ -18,26 +18,31 @@ export interface Consultation {
   caseFor: string[];
   againstHeading: string;
   caseAgainst: string[];
-  options: { label: string; text: string }[];
-  optionsNote?: string;
+  /** Ideas to start the discussion. They are not a closed list. The letters match the "closest idea" question in the form. */
+  ideas: { label: string; text: string }[];
+  ideasNote?: string;
   answerNote: string;
-  /** The Tally form ID. Until it is set, the page says that the form opens when the consultation opens. */
-  tallyFormId?: string;
-  /**
-   * The questions to create in Tally, for the maintainer. They are not shown on the page.
-   * Duplicate the template form, then add the questions that are specific to this consultation.
-   */
-  formQuestions: string[];
 }
 
-const SHARED_QUESTIONS = {
-  role: "Your role (required): Agent or intermediary / Club staff / Player / Parent or guardian / Data or software provider / Other",
-  why: "Why? (optional, long text)",
-  country: "Country where you work (optional)",
-  email: "Email address, if you want the summary (optional)",
-  confirm:
-    'Confirmation (required): "I am 18 or older, and I have read the privacy notice at https://fpds.football/consult/privacy/"',
-};
+/**
+ * The ID of the one Tally form that all consultations use (DECISIONS.md D-44 in the spec repository).
+ * Until it is set, each page says that the form opens when the consultation opens.
+ */
+export const TALLY_FORM_ID: string | undefined = undefined;
+
+/**
+ * The questions to create in the Tally form, for the maintainer. They are not shown on the page.
+ * The page sends the slug of the consultation in the URL, and Tally stores it in the hidden field.
+ */
+export const TALLY_FORM_QUESTIONS = [
+  'Hidden field: "consultation"',
+  "Your role (required): Agent or intermediary / Club staff / Club medical staff / Player / Parent or guardian / Data or software provider / Other",
+  'Your answer (required, long text). Help text: "Do not write about the health, wages or contract of a specific person."',
+  "Which idea is closest to your view? (optional): A / B / C / D / None of these / Not sure",
+  "Your name (optional)",
+  "Email address, if you want the summary (optional)",
+  'Confirmation (required): "I am 18 or older, and I have read the privacy notice at https://fpds.football/consult/privacy/"',
+] as const;
 
 export const consultations: Consultation[] = [
   {
@@ -70,7 +75,7 @@ export const consultations: Consultation[] = [
       "A forwarded document can show the terms to clubs that the sender did not choose.",
       "A published fee can weaken the position of the selling club in a negotiation.",
     ],
-    options: [
+    ideas: [
       { label: "A. Include the amount.", text: "The submission states the fee or the percentage, with its source." },
       {
         label: "B. Include only whether one exists.",
@@ -78,17 +83,8 @@ export const consultations: Consultation[] = [
       },
       { label: "C. Leave them out.", text: "Parties discuss these terms outside the submission." },
     ],
-    optionsNote: "You can choose a different option for release clauses and for sell-on percentages.",
+    ideasNote: "Your answer can give a different idea for release clauses and for sell-on percentages.",
     answerNote: "You can answer without an email address.",
-    formQuestions: [
-      SHARED_QUESTIONS.role,
-      "Release clauses (required): A. Include the amount / B. Include only whether one exists / C. Leave them out",
-      "Sell-on percentages (required): A. Include the amount / B. Include only whether one exists / C. Leave them out",
-      SHARED_QUESTIONS.why,
-      SHARED_QUESTIONS.country,
-      SHARED_QUESTIONS.email,
-      SHARED_QUESTIONS.confirm,
-    ],
   },
   {
     slug: "medical-availability",
@@ -125,7 +121,7 @@ export const consultations: Consultation[] = [
       "A status goes out of date quickly, but the document stays in inboxes.",
       "Clubs do a medical examination before a transfer, so a status adds little.",
     ],
-    options: [
+    ideas: [
       { label: "A. No medical information.", text: "Parties discuss fitness outside the submission." },
       {
         label: "B. A status only.",
@@ -137,14 +133,6 @@ export const consultations: Consultation[] = [
       },
     ],
     answerNote: "Do not write about the health of a specific person in your answer.",
-    formQuestions: [
-      "Your role (required): Agent or intermediary / Club staff / Club medical staff / Player / Parent or guardian / Data or software provider / Other",
-      "Your answer (required): A. No medical information / B. A status only / C. A status and an expected return date",
-      `${SHARED_QUESTIONS.why}. Help text: "Do not write about the health of a specific person."`,
-      SHARED_QUESTIONS.country,
-      SHARED_QUESTIONS.email,
-      SHARED_QUESTIONS.confirm,
-    ],
   },
   {
     slug: "wages",
@@ -176,7 +164,7 @@ export const consultations: Consultation[] = [
       "A forwarded document can show a wage to clubs that the sender did not choose.",
       "A stated expectation can weaken the position of the player in a negotiation.",
     ],
-    options: [
+    ideas: [
       { label: "A. No wage information.", text: "Parties discuss wages outside the submission." },
       { label: "B. A yes or no question.", text: '"Is the player open to a lower wage?"' },
       {
@@ -186,15 +174,6 @@ export const consultations: Consultation[] = [
       { label: "D. The current wage.", text: "The exact amount, with its source." },
     ],
     answerNote: "Do not write the wage of a specific person in your answer.",
-    formQuestions: [
-      SHARED_QUESTIONS.role,
-      "Your answer (required): A. No wage information / B. A yes or no question / C. An expected range / D. The current wage",
-      "If FPDS includes wage information, do you use FPDS? (required): Yes / No / Not sure",
-      `${SHARED_QUESTIONS.why}. Help text: "Do not write the wage of a specific person."`,
-      SHARED_QUESTIONS.country,
-      SHARED_QUESTIONS.email,
-      SHARED_QUESTIONS.confirm,
-    ],
   },
 ];
 
