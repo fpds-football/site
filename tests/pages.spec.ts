@@ -92,3 +92,8 @@ test("a page that does not exist has security headers", async ({ request }) => {
   expect(response.headers()["x-content-type-options"]).toBe("nosniff");
   expect(response.headers()["x-frame-options"]).toBe("DENY");
 });
+
+test("each page states the commit that built it", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator('meta[name="fpds-version"]')).toHaveAttribute("content", /^[0-9a-f]{7}$/);
+});

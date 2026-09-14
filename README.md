@@ -58,6 +58,13 @@ pnpm test:e2e
 
 ## Deployment
 
+Each page has a `<meta name="fpds-version">` tag with the commit that built it. To see which commit is live:
+
+```bash
+curl -s https://fpds.football/ | grep -o 'fpds-version" content="[^"]*'
+```
+
+
 The site deploys with Cloudflare Workers Builds.
 
 1. In Cloudflare, go to **Workers & Pages** and create an application from the `fpds-football/site` repository.
