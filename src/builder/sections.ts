@@ -8,7 +8,7 @@ export interface SectionDefinition {
 }
 
 export const SECTIONS: SectionDefinition[] = [
-  { id: "submission", title: "Submission", prefixes: ["/submission"] },
+  { id: "submission", title: "Purpose and sender", prefixes: ["/submission"] },
   { id: "player", title: "Player", prefixes: ["/player"] },
   { id: "positions", title: "Positions", prefixes: ["/positions"] },
   { id: "contract", title: "Contract", prefixes: ["/contract"] },

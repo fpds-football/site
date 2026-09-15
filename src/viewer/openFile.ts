@@ -17,7 +17,7 @@ export function readViewedFile(text: string): ViewedFile {
   try {
     value = JSON.parse(text);
   } catch {
-    return { kind: "refused", title: "This file is not JSON.", message: "An FPDS submission is a JSON file that ends with .fpds.json." };
+    return { kind: "refused", title: "This file is not JSON.", message: "An FPDS player profile is a JSON file that ends with .fpds.json." };
   }
 
   const opened = readOpenedFile(text);

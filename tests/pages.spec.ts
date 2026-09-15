@@ -1,14 +1,14 @@
 import { expect, type Page, test } from "@playwright/test";
 
 const PAGES = [
-  { path: "/", heading: "A player submission should say who claimed what." },
+  { path: "/", heading: "A player profile should say who claimed what." },
   { path: "/consult/", heading: "Help decide what goes into FPDS." },
-  { path: "/consult/release-clauses/", heading: "Do release clauses and sell-on percentages belong in a player submission?" },
-  { path: "/consult/medical-availability/", heading: "Does a player submission say whether the player is fit to play?" },
-  { path: "/consult/wages/", heading: "Does a player submission include information about wages?" },
+  { path: "/consult/release-clauses/", heading: "Do release clauses and sell-on percentages belong in a player profile?" },
+  { path: "/consult/medical-availability/", heading: "Does a player profile say whether the player is fit to play?" },
+  { path: "/consult/wages/", heading: "Does a player profile include information about wages?" },
   { path: "/consult/privacy/", heading: "Privacy notice for consultations" },
-  { path: "/build/", heading: "Create a submission" },
-  { path: "/view/", heading: "View a submission" },
+  { path: "/build/", heading: "Create a player profile" },
+  { path: "/view/", heading: "View a player profile" },
 ];
 
 function collectProblems(page: Page): string[] {
@@ -44,7 +44,7 @@ for (const { path, heading } of PAGES) {
 
 test("the homepage link preview describes the standard", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", /free, open standard for player submissions/);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", /free, open standard for player profiles/);
 });
 
 test("each page has link preview tags and a canonical URL", async ({ page }) => {
@@ -74,7 +74,7 @@ test("a link to a consultation navigates without a full page load", async ({ pag
   });
   await page.getByRole("link", { name: "Wages" }).first().click();
   await expect(page).toHaveURL("/consult/wages/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Does a player submission include information about wages?");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Does a player profile include information about wages?");
   expect(await page.evaluate(() => (window as { marker?: string }).marker)).toBe("same-document");
 });
 

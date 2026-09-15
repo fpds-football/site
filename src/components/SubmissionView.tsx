@@ -211,7 +211,7 @@ export function SubmissionView({
   );
 
   return (
-    <LayerCard render={<article />} aria-label="Submission preview">
+    <LayerCard render={<article />} aria-label="Player profile preview">
       <LayerCard.Secondary>
         <div data-anchor="header" tabIndex={-1} className="w-full min-w-0 scroll-mt-4 outline-none transition-shadow duration-300 data-highlight:ring-2 data-highlight:ring-kumo-brand">
           <div className="flex items-center justify-between gap-3">
@@ -420,7 +420,7 @@ function SubmissionDetails({ submission, consent, issuesAt }: { submission: Doc;
     ["Sent by", "/submission/sender", label(VALUE_LABELS.sender, submission.sender)],
     ["Lawful basis", "/consent/lawful_basis", lawfulBasis && (consentDate ? `${lawfulBasis}, given on ${consentDate}` : lawfulBasis)],
     ["Created", "/submission/submitted_at", formatTimestamp(submission.submitted_at)],
-    ["Submission ID", "/submission/submission_id", asText(submission.submission_id)],
+    ["File ID", "/submission/submission_id", asText(submission.submission_id)],
   ];
   const shown = rows.filter(([, anchor, value]) => value || issuesAt(anchor).length > 0);
   if (shown.length === 0) return null;
@@ -439,7 +439,7 @@ function SubmissionDetails({ submission, consent, issuesAt }: { submission: Doc;
             >
               <dt className="text-kumo-subtle">{term}</dt>
               <dd className="m-0 min-w-0 text-kumo-default">
-                <span className={term === "Submission ID" ? "font-mono text-xs leading-5 break-all" : ""}>{value ?? NOT_IN_FILE}</span>
+                <span className={term === "File ID" ? "font-mono text-xs leading-5 break-all" : ""}>{value ?? NOT_IN_FILE}</span>
                 <IssueNotes issues={rowIssues} />
               </dd>
             </div>

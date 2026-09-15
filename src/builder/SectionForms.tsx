@@ -28,7 +28,7 @@ export function SectionForm({ section, builder }: { section: SectionId; builder:
           <SelectField
             builder={builder}
             pointer="/submission/sender"
-            label="Who sends this submission?"
+            label="Who sends this profile?"
             options={{ intermediary: "An intermediary, for example an agent", player: "The player" }}
           />
         </>

@@ -72,7 +72,7 @@ export function Builder() {
 
   const onSaveDraft = () => {
     downloadFile(draftFileContents(builder.draft), draftFileName(builder.draft));
-    setMessage("Saved a draft file. A draft is not an FPDS submission. Open it here to continue.");
+    setMessage("Saved a draft file. A draft is not a finished player profile. Open it here to continue.");
   };
 
   const onOpen = async (file: File | undefined) => {
@@ -85,7 +85,7 @@ export function Builder() {
       setMessage(
         opened.kind === "draft"
           ? `Opened the draft ${file.name}.`
-          : `Opened ${file.name}. When you export, the submission gets a new ID, because it is a new version.`,
+          : `Opened ${file.name}. When you export, the profile gets a new file ID, because it is a new version.`,
       );
     }
     if (fileInput.current) fileInput.current.value = "";
@@ -108,7 +108,7 @@ export function Builder() {
       <div className="mt-8 mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-[clamp(1.5rem,1.1rem+1.5vw,2.1rem)] leading-tight font-semibold tracking-[-0.02em] text-kumo-strong">
-            Create a submission
+            Create a player profile
           </h1>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-kumo-subtle">
             <LockSimpleIcon aria-hidden="true" />
@@ -161,7 +161,7 @@ export function Builder() {
             variant="alert"
             icon={<WarningIcon weight="fill" />}
             title="This player is a minor."
-            description="Safeguarding rules apply. An intermediary must send the submission, and the player cannot send it. FIFA rules on the protection of minors and national safeguarding rules apply."
+            description="Safeguarding rules apply. An intermediary must send the profile, and the player cannot send it. FIFA rules on the protection of minors and national safeguarding rules apply."
           />
         </div>
       ) : null}
@@ -234,7 +234,7 @@ export function Builder() {
                 aria-describedby="export-status"
                 className="w-full justify-center"
               >
-                Export submission
+                Export profile
               </Button>
               {exportResult.valid ? (
                 <p id="export-status" className="mt-2 flex items-center gap-1.5 text-sm text-kumo-success">
@@ -294,7 +294,7 @@ export function Builder() {
           {preview === "club" ? (
             <>
               <p className="mb-2 flex items-center gap-2 text-sm text-kumo-subtle">
-                How a club sees this submission <Badge variant="neutral">Preview</Badge>
+                How a club sees this profile <Badge variant="neutral">Preview</Badge>
               </p>
               <SubmissionView document={exportResult.document ?? exportResult.preview} isMinor={builder.isMinor} />
             </>
@@ -302,7 +302,7 @@ export function Builder() {
             <FileView document={exportResult.document ?? exportResult.preview} complete={exportResult.valid} />
           )}
           <p className="mt-2 text-xs text-kumo-subtle">
-            FPDS checks the structure of a submission. It does not check that the information is true.
+            FPDS checks the structure of a player profile. It does not check that the information is true.
           </p>
         </aside>
       </div>

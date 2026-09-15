@@ -41,6 +41,7 @@ This repository is the website at `https://fpds.football`. The specification is 
 ## Content
 
 - All text is Simple English (ASD-STE100, pragmatic mode), with British spelling. Use the `simple-english` skill. The homepage headline keeps its voice.
+- Text for people says "player profile" or "profile", not "submission" (FPDS D-46). The ID of a version is the "file ID". Code names, schema fields and messages from `@fpds-football/fpds` keep "submission".
 - Consultations are data in `src/content/consultations.ts`. A new consultation is a new entry and a small route file. All consultations use one Tally form (`TALLY_FORM_ID`). The page sends the slug in the hidden field `consultation`. Do not make a form for each consultation.
 - The ideas on a consultation page are suggestions, not a closed list. The answer is free text.
 - Each page sets its title, description and Open Graph tags with `pageHead`.

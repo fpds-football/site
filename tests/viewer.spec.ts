@@ -11,7 +11,7 @@ async function openFile(page: Page, name: string, buffer = fixture(name)) {
 
 /** The source badges in the row of a term in the submission card. */
 function row(page: Page, term: string) {
-  return page.getByRole("article", { name: "Submission preview" }).locator("dl > div").filter({ has: page.getByRole("term").filter({ hasText: new RegExp(`^${term}$`) }) });
+  return page.getByRole("article", { name: "Player profile preview" }).locator("dl > div").filter({ has: page.getByRole("term").filter({ hasText: new RegExp(`^${term}$`) }) });
 }
 
 test.beforeEach(async ({ page }) => {
@@ -22,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 
 test("a valid file renders with no banner, and its source badges match its provenance", async ({ page }) => {
   await openFile(page, "midfielder-under-contract.fpds.json");
-  const card = page.getByRole("article", { name: "Submission preview" });
+  const card = page.getByRole("article", { name: "Player profile preview" });
 
   await expect(card).toContainText("Tomasz Andrzej Wojcik");
   await expect(page.getByTestId("invalid-banner")).toHaveCount(0);
@@ -54,7 +54,7 @@ test("a valid file renders with no banner, and its source badges match its prove
 
 test("video links open in a new tab only when the reader selects them", async ({ page }) => {
   await openFile(page, "midfielder-under-contract.fpds.json");
-  const video = page.getByRole("article", { name: "Submission preview" }).getByRole("region", { name: "Video" });
+  const video = page.getByRole("article", { name: "Player profile preview" }).getByRole("region", { name: "Video" });
 
   const items = video.getByRole("listitem");
   await expect(items).toHaveCount(2);
@@ -91,15 +91,15 @@ test("a dropped file opens", async ({ page }) => {
   await page.dispatchEvent("[data-testid=drop-zone]", "drop", { dataTransfer });
 
   await expect(page.getByTestId("file-name")).toHaveText("free-agent.fpds.json");
-  await expect(page.getByRole("article", { name: "Submission preview" })).toBeVisible();
+  await expect(page.getByRole("article", { name: "Player profile preview" })).toBeVisible();
 });
 
 test("an invalid file shows the submission under a red banner, with the problem in plain English", async ({ page }) => {
   await openFile(page, "invalid-missing-expiry.fpds.json");
   const banner = page.getByTestId("invalid-banner");
-  await expect(banner).toContainText("Not a valid FPDS submission");
+  await expect(banner).toContainText("Not a valid FPDS player profile");
   await expect(banner).toContainText("Contract expiry date is required when the player is under contract or on loan.");
-  await expect(page.getByRole("article", { name: "Submission preview" })).toContainText("Tomasz Andrzej Wojcik");
+  await expect(page.getByRole("article", { name: "Player profile preview" })).toContainText("Tomasz Andrzej Wojcik");
   await expect(page.getByTestId("structure-note")).toBeVisible();
   await expect(page.getByText("The viewer found no problems")).toHaveCount(0);
 
@@ -120,7 +120,7 @@ test("a minor status that does not agree with the date of birth shows the calcul
   await expect(page.getByTestId("invalid-banner")).toContainText(message);
   // Safeguarding wins over the file: the badge shows, with the calculated status next to it.
   await expect(page.getByTestId("minor-badge")).toBeVisible();
-  await expect(page.getByTestId("minor-note")).toHaveText("The file says: not a minor. The date of birth says: a minor, age 16 on the date of the submission.");
+  await expect(page.getByTestId("minor-note")).toHaveText("The file says: not a minor. The date of birth says: a minor, age 16 on the date that the profile was made.");
 });
 
 test("a valid file about a minor shows the minor badge", async ({ page }) => {
@@ -135,7 +135,7 @@ test("an unsupported version is refused and the fields do not show", async ({ pa
   const refusal = page.getByTestId("refusal");
   await expect(refusal).toContainText("This viewer cannot show this file.");
   await expect(refusal).toContainText("This document has version 0.2.0. This software supports FPDS 0.1.");
-  await expect(page.getByRole("article", { name: "Submission preview" })).toHaveCount(0);
+  await expect(page.getByRole("article", { name: "Player profile preview" })).toHaveCount(0);
   await expect(page.getByText("Tomasz")).toHaveCount(0);
 });
 
@@ -143,8 +143,8 @@ test("a draft file is refused, and Open in builder continues the draft", async (
   const draft = { fpds_draft: { format: 1, saved_at: "2026-09-14T10:00:00.000Z" }, draft: { player: { full_name: "Mateo Silva Ferreira" } } };
   await openFile(page, "mateo.fpds-draft.json", Buffer.from(JSON.stringify(draft)));
 
-  await expect(page.getByTestId("refusal")).toContainText("This is a draft from the builder, not a submission.");
-  await expect(page.getByRole("article", { name: "Submission preview" })).toHaveCount(0);
+  await expect(page.getByTestId("refusal")).toContainText("This is a draft from the builder, not a player profile.");
+  await expect(page.getByRole("article", { name: "Player profile preview" })).toHaveCount(0);
 
   await page.getByRole("button", { name: "Open in builder" }).click();
   await expect(page).toHaveURL(/\/build\/$/);
@@ -155,7 +155,7 @@ test("a draft file is refused, and Open in builder continues the draft", async (
 test("a file that is not JSON is refused", async ({ page }) => {
   await openFile(page, "notes.fpds.json", Buffer.from("Good lad, 10 goals, plays centre mid."));
   await expect(page.getByTestId("refusal")).toContainText("This file is not JSON.");
-  await expect(page.getByRole("article", { name: "Submission preview" })).toHaveCount(0);
+  await expect(page.getByRole("article", { name: "Player profile preview" })).toHaveCount(0);
 });
 
 test("JSON that is not an FPDS document is refused", async ({ page }) => {
@@ -234,7 +234,7 @@ test("Edit in builder opens the document in the builder, and the export has a ne
   expect(draft.consent.is_minor).toBeUndefined();
 
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export submission" }).click();
+  await page.getByRole("button", { name: "Export profile" }).click();
   const exported = JSON.parse(readFileSync(await (await download).path(), "utf8"));
   expect(validate(exported).valid).toBe(true);
   expect(exported.submission.submission_id).not.toBe(original.submission.submission_id);

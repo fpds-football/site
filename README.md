@@ -1,13 +1,13 @@
 # fpds.football
 
-The website of the [Football Player Data Standard (FPDS)](https://github.com/fpds-football/spec): the homepage, the consultations, the submission builder and the submission viewer.
+The website of the [Football Player Data Standard (FPDS)](https://github.com/fpds-football/spec): the homepage, the consultations, the builder and the viewer for player profiles.
 
 ## What the site does
 
 - **Homepage.** Explains FPDS and links to the specification, the schema and the consultations.
 - **Consultations.** One page for each open consultation. Agents, clubs and players answer in a Tally form. `src/content/consultations.ts` contains each consultation as data.
 - **Builder** at `/build/`. A person fills in a form and exports a file that ends with `.fpds.json`. The builder runs only in the browser. Player data never goes to a server.
-- **Viewer** at `/view/`. A club opens a `.fpds.json` file and sees the submission, the source of each value, and any problems with the file. The viewer runs only in the browser. The file never leaves the browser.
+- **Viewer** at `/view/`. A club opens a `.fpds.json` file and sees the player profile, the source of each value, and any problems with the file. The viewer runs only in the browser. The file never leaves the browser.
 
 This repository does not serve the schema. `fpds-football/spec` serves `https://fpds.football/schema/*`, so the permanent schema URL does not depend on this site.
 

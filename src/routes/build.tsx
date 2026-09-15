@@ -8,13 +8,13 @@ export const Route = createFileRoute("/build")({
   ssr: false,
   head: () =>
     pageHead({
-      title: "Create a submission: FPDS",
-      description: "Create an FPDS player submission in your browser. Your information never leaves your device.",
+      title: "Create a player profile: FPDS",
+      description: "Create an FPDS player profile in your browser. Your information never leaves your device.",
       path: "/build/",
     }),
   pendingComponent: () => (
     <div className="wrap mt-8 text-kumo-subtle">
-      <h1 className="text-2xl font-semibold text-kumo-strong">Create a submission</h1>
+      <h1 className="text-2xl font-semibold text-kumo-strong">Create a player profile</h1>
       <p>The builder is loading. It runs in your browser, and sends nothing to a server.</p>
     </div>
   ),

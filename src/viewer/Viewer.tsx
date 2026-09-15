@@ -127,7 +127,7 @@ export function Viewer() {
       <div className="max-w-[48rem]">
         <div className="mt-8 mb-6 print:hidden">
           <h1 className="text-[clamp(1.5rem,1.1rem+1.5vw,2.1rem)] leading-tight font-semibold tracking-[-0.02em] text-kumo-strong">
-            View a submission
+            View a player profile
           </h1>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-kumo-subtle">
             <LockSimpleIcon aria-hidden="true" className="shrink-0" />
@@ -247,9 +247,9 @@ function Refusal({
         <Banner
           data-testid="refusal"
           icon={<InfoIcon weight="fill" />}
-          title="This is a draft from the builder, not a submission."
+          title="This is a draft from the builder, not a player profile."
           description={describe(
-            "The file contains unfinished work. Open it in the builder to continue, then export the submission.",
+            "The file contains unfinished work. Open it in the builder to continue, then export the profile.",
             <Button variant="primary" icon={<PencilSimpleIcon />} onClick={() => onOpenBuilder(file.draft)}>
               Open in builder
             </Button>,
@@ -292,7 +292,7 @@ function DocumentResult({
   const isMinor = calculatedMinor === true || consent.is_minor === true;
   // The problem list has the full message from the library. Next to the name, a short comparison is enough.
   const minorNote = mismatch
-    ? `The file says: ${consent.is_minor ? "a minor" : "not a minor"}. The date of birth says: ${calculatedMinor ? "a minor" : "not a minor"}${age === undefined ? "" : `, age ${age} on the date of the submission`}.`
+    ? `The file says: ${consent.is_minor ? "a minor" : "not a minor"}. The date of birth says: ${calculatedMinor ? "a minor" : "not a minor"}${age === undefined ? "" : `, age ${age} on the date that the profile was made`}.`
     : undefined;
 
   return (
@@ -318,10 +318,10 @@ function DocumentResult({
             data-testid="invalid-banner"
             variant="error"
             icon={<WarningCircleIcon weight="fill" />}
-            title="Not a valid FPDS submission"
+            title="Not a valid FPDS player profile"
             description={
               <>
-                <span className="block">Each problem also shows at its place in the submission. Select a problem to go to it.</span>
+                <span className="block">Each problem also shows at its place in the profile. Select a problem to go to it.</span>
                 <IssueList issues={errors} />
               </>
             }

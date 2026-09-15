@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
     pageHead({
       title: "FPDS: Football Player Data Standard",
       description:
-        "A free, open standard for player submissions from agents and players to clubs. Every figure has its context, and every claim shows who made it.",
+        "A free, open standard for player profiles that agents and players send to clubs. Every figure has its context, and every claim shows who made it.",
       path: "/",
     }),
   component: Home,
@@ -24,16 +24,16 @@ function Home() {
 
       <main className="wrap">
         <h1 className="mt-12 mb-5 max-w-[20ch] text-[clamp(1.75rem,1.2rem+2vw,2.6rem)] leading-[1.15] font-semibold tracking-[-0.025em] text-kumo-strong">
-          A player submission should say who claimed what.
+          A player profile should say who claimed what.
         </h1>
 
         <p className="prose-block mb-4 text-lg leading-relaxed">
-          FPDS is a free, open standard for player submissions. A player submission is the information that an agent,
-          an intermediary or a player sends to a club about a player.
+          FPDS is a free, open standard for player profiles. A player profile is the information that an agent, an
+          intermediary or a player sends to a club about a player.
         </p>
         <p className="prose-block mb-10">
-          FPDS gives every submission the same structure. Every figure has its context, and every claim shows who made
-          it. A club can then read a submission in seconds, compare it with others, and see what it can check.
+          FPDS gives every player profile the same structure. Every figure has its context, and every claim shows who
+          made it. A club can then read a profile in seconds, compare it with others, and see what it can check.
         </p>
 
         <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -44,7 +44,7 @@ function Home() {
               </h2>
             </LayerCard.Secondary>
             <LayerCard.Primary className="flex-1 p-5">
-              <p className="mb-3">Today, most submissions are free text in an email or a message:</p>
+              <p className="mb-3">Today, most player profiles are free text in an email or a message:</p>
               <blockquote className="mb-3 border-l-2 border-kumo-line pl-4 text-kumo-subtle italic">
                 “Good lad, played in X league, 10 goals, plays centre mid, available now.”
               </blockquote>
@@ -72,14 +72,14 @@ function Home() {
                   every claim.
                 </Goal>
                 <Goal title="Agents and players get taken seriously.">
-                  A clear, complete submission gets read. A submission that shows its sources gets trust.
+                  A clear, complete profile gets read. A profile that shows its sources gets trust.
                 </Goal>
                 <Goal title="Software can read and write it.">
                   Agency tools, scouting platforms and club systems can all use the same open format, without a licence
                   fee.
                 </Goal>
                 <Goal title="Player data is shared with care.">
-                  FPDS contains no medical records, and it marks every submission about a minor.
+                  FPDS contains no medical records, and it marks every profile about a minor.
                 </Goal>
               </ul>
             </LayerCard.Primary>
@@ -94,7 +94,7 @@ function Home() {
           </LayerCard.Secondary>
           <LayerCard.Primary className="p-5">
             <dl
-              aria-label="Example submission showing verified and agent-stated claims"
+              aria-label="Example player profile showing verified and agent-stated claims"
               className="m-0 grid grid-cols-1 gap-x-5 sm:grid-cols-[minmax(7rem,11rem)_1fr]"
             >
               <Claim label="Contract expires" value="30 June 2027" mark="Verified · FIFA TMS" kind="checked" />
@@ -108,7 +108,7 @@ function Home() {
         </LayerCard>
 
         <p className="mb-12 max-w-[44rem] text-sm text-kumo-subtle">
-          The same submission, with the source of each value shown. Three of these values come from a source that you
+          The same profile, with the source of each value shown. Three of these values come from a source that you
           can check. Three come only from the agent. A recruitment analyst sees the difference in less than a second.
           If an interface shows a verified figure and an unverified figure in the same way, the format has no purpose.
         </p>
@@ -118,7 +118,7 @@ function Home() {
             How it works
           </h2>
           <ol className="mb-0 list-none space-y-4 pl-0">
-            <HowStep number={1} title="Create the submission">
+            <HowStep number={1} title="Create the profile">
               Use the free <Link href="/build/">builder</Link> on this site, or software that supports FPDS. The builder
               runs in your browser, and your information stays on your device.
             </HowStep>
@@ -135,8 +135,8 @@ function Home() {
         </section>
 
         <nav aria-label="Main links" className="mb-12 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
-          <LinkCard href="/build/" title="Create a submission" note="In your browser. Your data stays on your device." className="lg:col-span-3" />
-          <LinkCard href="/view/" title="View a submission" note="Open a file from an agent. The file stays on your device." className="lg:col-span-3" />
+          <LinkCard href="/build/" title="Create a player profile" note="In your browser. Your data stays on your device." className="lg:col-span-3" />
+          <LinkCard href="/view/" title="View a player profile" note="Open a file from an agent. The file stays on your device." className="lg:col-span-3" />
           <LinkCard href={SPEC_URL} title="Read the specification" note="The normative document, in fourteen sections" className="lg:col-span-2" />
           <LinkCard href="/schema/v0.1/player.json" title="Get the schema" note="JSON Schema 2020-12, at a permanent URL" className="lg:col-span-2" />
           <LinkCard href="/consult/" title="Take part" note="Help decide what goes into FPDS" className="sm:col-span-2 lg:col-span-2" />
@@ -167,7 +167,7 @@ function Home() {
           <ul>
             <li>
               <strong>Not a protocol.</strong> It defines the structure of a document, not how two systems exchange it.
-              A submission can travel by email, API, file transfer or message.
+              A profile can travel by email, API, file transfer or message.
             </li>
             <li>
               <strong>Not a registry.</strong> It does not tell you whether a claim is true. It tells you who made the
@@ -191,7 +191,7 @@ function Home() {
             <code>{`pip install check-jsonschema
 check-jsonschema \\
   --schemafile https://fpds.football/schema/v0.1/player.json \\
-  submission.json`}</code>
+  player.fpds.json`}</code>
           </pre>
           <p>Some rules are not in the schema. Section 13.1 of the specification lists them.</p>
         </div>

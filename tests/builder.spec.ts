@@ -34,10 +34,10 @@ async function clearEverything(page: Page) {
 
 /** A free agent who sends their own profile: the smallest valid submission. */
 async function fillFreeAgent(page: Page) {
-  await section(page, "Submission");
+  await section(page, "Purpose and sender");
   await page.getByRole("checkbox", { name: "Permanent transfer" }).check();
   await page.getByRole("checkbox", { name: "Trial" }).check();
-  await choose(page, "Who sends this submission?", "The player");
+  await choose(page, "Who sends this profile?", "The player");
 
   await section(page, "Player");
   await page.getByLabel("Full name").fill("Daniel Okoye");
@@ -58,7 +58,7 @@ async function fillFreeAgent(page: Page) {
 
 async function exportDocument(page: Page) {
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export submission" }).click();
+  await page.getByRole("button", { name: "Export profile" }).click();
   const file = await download;
   const path = await file.path();
   return { name: file.suggestedFilename(), document: JSON.parse(readFileSync(path, "utf8")) };
@@ -66,7 +66,7 @@ async function exportDocument(page: Page) {
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/build/");
-  await expect(page.getByRole("heading", { level: 2, name: "Submission" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Purpose and sender" })).toBeVisible();
 });
 
 test("exports a valid submission that the library accepts", async ({ page }) => {
@@ -128,7 +128,7 @@ test("the file view shows the file that the export makes", async ({ page }) => {
   await expect(contents).not.toContainText("expiry_date");
 
   await page.getByRole("tab", { name: "How a club sees it" }).click();
-  await expect(page.getByRole("article", { name: "Submission preview" })).toBeVisible();
+  await expect(page.getByRole("article", { name: "Player profile preview" })).toBeVisible();
 });
 
 test("each export of the same draft has a new submission ID", async ({ page }) => {
@@ -154,25 +154,25 @@ test("sends no request that is not a static file from this site", async ({ page,
 });
 
 test("export is blocked until the submission is valid, and lists what is missing", async ({ page }) => {
-  await page.getByRole("button", { name: "Export submission" }).click();
+  await page.getByRole("button", { name: "Export profile" }).click();
   await expect(page.getByTestId("export-checklist")).toContainText("Purposes is required.");
   await expect(page.getByTestId("export-checklist")).toContainText("Full name is required.");
 });
 
 test("a minor cannot send their own submission, and the fix changes the sender", async ({ page }) => {
-  await choose(page, "Who sends this submission?", "The player");
+  await choose(page, "Who sends this profile?", "The player");
   await section(page, "Player");
   await page.getByLabel("Date of birth").fill("2010-03-08");
 
   await expect(page.getByTestId("minor-notice")).toBeVisible();
-  await section(page, "Submission");
+  await section(page, "Purpose and sender");
   const conflict = page.getByRole("alert").filter({ hasText: "A minor cannot send their own submission." });
   await expect(conflict).toBeVisible();
 
   // The builder does not change the sender without the user.
-  await expect(selectTrigger(page, "Who sends this submission?")).toContainText("The player");
+  await expect(selectTrigger(page, "Who sends this profile?")).toContainText("The player");
   await conflict.getByRole("button", { name: "Change the sender to intermediary" }).click();
-  await expect(selectTrigger(page, "Who sends this submission?")).toContainText("An intermediary");
+  await expect(selectTrigger(page, "Who sends this profile?")).toContainText("An intermediary");
 
   await section(page, "Representation");
   await expect(page.getByLabel("Agent name")).toBeVisible();
@@ -240,7 +240,7 @@ test("opening an FPDS document and exporting it gives a new version", async ({ p
   const original = JSON.parse(example.toString());
 
   await page.getByTestId("open-file").setInputFiles({ name: "midfielder.fpds.json", mimeType: "application/json", buffer: example });
-  await expect(page.getByRole("status").filter({ hasText: "new ID" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "new file ID" })).toBeVisible();
   await expect(page.getByText("The file is valid against FPDS 0.1.")).toBeVisible();
 
   const { document } = await exportDocument(page);
@@ -252,7 +252,7 @@ test("opening an FPDS document and exporting it gives a new version", async ({ p
 
 test("every form control has text of 16px or more, so iOS Safari does not zoom on focus", async ({ page }) => {
   // Make the conditional controls visible: source selectors, a season record and the agent fields.
-  await choose(page, "Who sends this submission?", "An intermediary, for example an agent");
+  await choose(page, "Who sends this profile?", "An intermediary, for example an agent");
   await section(page, "Player");
   await page.getByLabel("Full name").fill("Daniel Okoye");
   await page.getByRole("button", { name: /^Source:/ }).first().click();
@@ -261,7 +261,7 @@ test("every form control has text of 16px or more, so iOS Safari does not zoom o
   await section(page, "Performance");
   await page.getByRole("button", { name: "Add a season" }).click();
 
-  for (const name of ["Submission", "Player", "Positions", "Contract", "Representation", "Performance", "Consent"]) {
+  for (const name of ["Purpose and sender", "Player", "Positions", "Contract", "Representation", "Performance", "Consent"]) {
     await section(page, name);
     const small = await page.evaluate(() =>
       [...document.querySelectorAll("input:not([type=checkbox]):not([type=file]), select, textarea")]
@@ -305,7 +305,7 @@ test("opening selects, menus, the country search and the dialog causes no Conten
     if (message.text().includes("Content Security Policy")) violations.push(message.text());
   });
 
-  await choose(page, "Who sends this submission?", "The player");
+  await choose(page, "Who sends this profile?", "The player");
   await section(page, "Player");
   await page.getByLabel("Full name").fill("Daniel Okoye");
   await page.getByRole("button", { name: /^Source:/ }).first().click();

@@ -48,17 +48,17 @@ export const consultations: Consultation[] = [
     slug: "release-clauses",
     oq: "OQ-14",
     title: "Release clauses and sell-on percentages",
-    question: "Do release clauses and sell-on percentages belong in a player submission?",
-    description: "Should a player submission include the release clause and the sell-on percentage? Tell us in three minutes.",
+    question: "Do release clauses and sell-on percentages belong in a player profile?",
+    description: "Should a player profile include the release clause and the sell-on percentage? Tell us in three minutes.",
     lede: "When an agent offers a player to a club, the club often asks two questions. Is there a release clause? Does the selling club keep a percentage of a future transfer fee? We want to know if FPDS includes these facts.",
     whoCanAnswer: "Agents, intermediaries, club staff, players, and other people who are 18 or older",
-    fpdsNow: "A submission cannot include a release clause or a sell-on percentage",
+    fpdsNow: "A profile cannot include a release clause or a sell-on percentage",
     sections: [
       {
         heading: "Why this question matters",
         paragraphs: [
           "A release clause is a fixed fee. If a club pays the fee, the player can leave. A sell-on percentage is a share of a future transfer fee that the selling club keeps.",
-          "These two facts change the cost of a transfer. They are also confidential terms between a club and a player. Parties forward submissions many times, so a confidential term can travel far.",
+          "These two facts change the cost of a transfer. They are also confidential terms between a club and a player. Parties forward profiles many times, so a confidential term can travel far.",
         ],
       },
     ],
@@ -75,12 +75,12 @@ export const consultations: Consultation[] = [
       "A published fee can weaken the position of the selling club in a negotiation.",
     ],
     ideas: [
-      { label: "A. Include the amount.", text: "The submission states the fee or the percentage, with its source." },
+      { label: "A. Include the amount.", text: "The profile states the fee or the percentage, with its source." },
       {
         label: "B. Include only whether one exists.",
-        text: 'The submission says "yes", "no" or "not stated". The club asks for the amount.',
+        text: 'The profile says "yes", "no" or "not stated". The club asks for the amount.',
       },
-      { label: "C. Leave them out.", text: "Parties discuss these terms outside the submission." },
+      { label: "C. Leave them out.", text: "Parties discuss these terms outside the profile." },
     ],
     ideasNote: "Your answer can give a different idea for release clauses and for sell-on percentages.",
     answerNote: "You can answer without an email address.",
@@ -89,16 +89,16 @@ export const consultations: Consultation[] = [
     slug: "medical-availability",
     oq: "OQ-15",
     title: "Medical availability",
-    question: "Does a player submission say whether the player is fit to play?",
-    description: "Should a player submission say whether the player is fit to play? Tell us in three minutes.",
-    lede: "A club that receives a submission wants to know if the player can play now. That fact is close to health data, and health data has strict legal protection. We want to know where FPDS draws the line.",
+    question: "Does a player profile say whether the player is fit to play?",
+    description: "Should a player profile say whether the player is fit to play? Tell us in three minutes.",
+    lede: "A club that receives a profile wants to know if the player can play now. That fact is close to health data, and health data has strict legal protection. We want to know where FPDS draws the line.",
     whoCanAnswer: "Agents, intermediaries, club staff, medical staff, players, and other people who are 18 or older",
-    fpdsNow: "A submission contains no medical information",
+    fpdsNow: "A profile contains no medical information",
     sections: [
       {
         heading: "What this question does not cover",
         paragraphs: [
-          "Diagnoses, injury details and medical history are not part of this consultation. FPDS does not permit them in a submission, for any option. In most countries they are special-category health data. A document that parties forward is the wrong place for them.",
+          "Diagnoses, injury details and medical history are not part of this consultation. FPDS does not permit them in a profile, for any option. In most countries they are special-category health data. A document that parties forward is the wrong place for them.",
         ],
       },
       {
@@ -121,7 +121,7 @@ export const consultations: Consultation[] = [
       "Clubs do a medical examination before a transfer, so a status adds little.",
     ],
     ideas: [
-      { label: "A. No medical information.", text: "Parties discuss fitness outside the submission." },
+      { label: "A. No medical information.", text: "Parties discuss fitness outside the profile." },
       {
         label: "B. A status only.",
         text: '"Available", "not available", "available with a managed load" or "not stated".',
@@ -137,11 +137,11 @@ export const consultations: Consultation[] = [
     slug: "wages",
     oq: "OQ-2",
     title: "Wages",
-    question: "Does a player submission include information about wages?",
-    description: "Should a player submission include information about wages? Tell us in three minutes.",
+    question: "Does a player profile include information about wages?",
+    description: "Should a player profile include information about wages? Tell us in three minutes.",
     lede: "Wages decide many transfers before a club talks about a fee. Wages are also the most private number in football. We want to know if FPDS includes any information about them.",
     whoCanAnswer: "Agents, intermediaries, club staff, players, and other people who are 18 or older",
-    fpdsNow: "A submission contains no information about wages",
+    fpdsNow: "A profile contains no information about wages",
     sections: [
       {
         heading: "Why this question matters",
@@ -164,7 +164,7 @@ export const consultations: Consultation[] = [
       "A stated expectation can weaken the position of the player in a negotiation.",
     ],
     ideas: [
-      { label: "A. No wage information.", text: "Parties discuss wages outside the submission." },
+      { label: "A. No wage information.", text: "Parties discuss wages outside the profile." },
       { label: "B. A yes or no question.", text: '"Is the player open to a lower wage?"' },
       {
         label: "C. An expected range.",

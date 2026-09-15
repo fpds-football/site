@@ -26,7 +26,7 @@ export function FileView({ document, complete }: { document: Draft | FpdsDocumen
       </p>
       {complete ? null : (
         <p className="mb-2 text-sm text-kumo-subtle">
-          The file is not complete. When it is valid, the export also adds the FPDS version, the submission ID, the time
+          The file is not complete. When it is valid, the export also adds the FPDS version, the file ID, the time
           and the minor status.
         </p>
       )}

@@ -25,7 +25,7 @@ function ConsultIndex() {
           <p className="eyebrow">Take part</p>
           <h1 className="page-title">Help decide what goes into FPDS.</h1>
           <p className="text-lg">
-            FPDS starts small. A new field enters the standard only after the people who use player submissions give
+            FPDS starts small. A new field enters the standard only after the people who use player profiles give
             their opinion. Agents, club staff and players know how transfers work. We ask you before we decide.
           </p>
           <p>
