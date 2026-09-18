@@ -26,7 +26,7 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
                   Open
                 </Badge>
               </Fact>
-              <Fact term="Open for">At least 14 days</Fact>
+              <Fact term="Open for">At least 4 weeks</Fact>
               <Fact term="Who can answer">{c.whoCanAnswer}</Fact>
               <Fact term="Time">About three minutes</Fact>
               <Fact term="FPDS now">{c.fpdsNow}</Fact>
@@ -90,7 +90,7 @@ export function ConsultationPage({ consultation: c }: { consultation: Consultati
 
           <h2 className="section-heading">What happens next</h2>
           <ol>
-            <li>The consultation stays open for at least 14 days.</li>
+            <li>The consultation stays open for at least 4 weeks.</li>
             <li>
               We publish a summary on this page. The summary shows the number of answers from each role, and the main
               reasons on each side. It does not show names.

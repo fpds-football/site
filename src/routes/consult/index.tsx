@@ -44,8 +44,9 @@ function ConsultIndex() {
 
           <h2 className="section-heading">Later</h2>
           <p>
-            A new consultation opens every two to three weeks. Each one stays open for at least 14 days. The full list
-            of open questions is in section 14 of the <Link href={`${SPEC_URL}#14-open-questions`}>specification</Link>.
+            A new consultation opens every two to three weeks, so more than one is open at the same time. Each one stays
+            open for at least 4 weeks. The full list of open questions is in section 14 of the{" "}
+            <Link href={`${SPEC_URL}#14-open-questions`}>specification</Link>.
           </p>
 
           <h2 className="section-heading">How we use your answers</h2>
